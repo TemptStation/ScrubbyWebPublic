@@ -1,0 +1,25 @@
+﻿@model  NewsViewModel
+@{
+    ViewData["Title"] = "News";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Gateway</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">News</li>
+    </ol>
+</nav>
+
+<center>
+    <h1>Scrubby News</h1>
+</center>
+<br/>
+<div class="col h-100 align-items-center">
+    @foreach (var ni in Model.NewsItems)
+    {
+        @await Html.PartialAsync("_NewsItem", ni)
+        ;
+    }
+</div>

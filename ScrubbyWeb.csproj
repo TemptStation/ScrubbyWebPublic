@@ -1,0 +1,327 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>0928caad-0ee4-4f6b-b390-7f068139e559</UserSecretsId>
+    <DockerfileContext>.</DockerfileContext>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BuildBundlerMinifier" Version="3.0.415" />
+    <PackageReference Include="DMISharp" Version="1.4.1" />
+    <PackageReference Include="Markdig" Version="0.17.1" />
+    <PackageReference Include="Markdig.SyntaxHighlighting" Version="1.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Kubernetes.Tools.Targets" Version="1.0.0" />
+    <PackageReference Include="MimeMapping" Version="1.0.1.17" />
+    <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="ScrubbyCommon" Version="1.1.20" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0007" />
+    <PackageReference Include="Terryberry.DataProtection.MongoDb" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Submodules\**" />
+    <Content Remove="Submodules\**" />
+    <EmbeddedResource Remove="Submodules\**" />
+    <None Remove="Submodules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\robots.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="wwwroot\lib\clipboard\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\lib\bootstrap-select\css\bootstrap-select.css.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\bootstrap-select.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\bootstrap-select.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\bootstrap-select.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\bootstrap-select.min.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-am_ET.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-am_ET.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-am_ET.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ar_AR.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ar_AR.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ar_AR.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-bg_BG.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-bg_BG.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-bg_BG.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-cs_CZ.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-cs_CZ.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-cs_CZ.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-da_DK.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-da_DK.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-da_DK.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-de_DE.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-de_DE.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-de_DE.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-en_US.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-en_US.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-en_US.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-es_CL.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-es_CL.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-es_CL.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-es_ES.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-es_ES.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-es_ES.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-et_EE.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-et_EE.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-et_EE.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-eu.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-eu.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-eu.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-fa_IR.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-fa_IR.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-fa_IR.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-fi_FI.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-fi_FI.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-fi_FI.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-fr_FR.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-fr_FR.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-fr_FR.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-hr_HR.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-hr_HR.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-hr_HR.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-hu_HU.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-hu_HU.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-hu_HU.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-id_ID.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-id_ID.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-id_ID.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-it_IT.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-it_IT.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-it_IT.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ja_JP.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ja_JP.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ja_JP.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-kh_KM.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-kh_KM.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-kh_KM.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ko_KR.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ko_KR.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ko_KR.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-lt_LT.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-lt_LT.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-lt_LT.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-lv_LV.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-lv_LV.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-lv_LV.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-nb_NO.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-nb_NO.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-nb_NO.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-nl_NL.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-nl_NL.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-nl_NL.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-pl_PL.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-pl_PL.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-pl_PL.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-pt_BR.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-pt_BR.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-pt_BR.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-pt_PT.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-pt_PT.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-pt_PT.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ro_RO.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ro_RO.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ro_RO.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ru_RU.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ru_RU.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ru_RU.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-sk_SK.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-sk_SK.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-sk_SK.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-sl_SI.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-sl_SI.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-sl_SI.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-sv_SE.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-sv_SE.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-sv_SE.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-tr_TR.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-tr_TR.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-tr_TR.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ua_UA.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ua_UA.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-ua_UA.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-vi_VN.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-vi_VN.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-vi_VN.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-zh_CN.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-zh_CN.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-zh_CN.min.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-zh_TW.js" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-zh_TW.js.map" />
+    <None Include="wwwroot\lib\bootstrap-select\js\i18n\defaults-zh_TW.min.js" />
+    <None Include="wwwroot\lib\bootstrap-toggle\js\bootstrap4-toggle.js" />
+    <None Include="wwwroot\lib\bootstrap-toggle\js\bootstrap4-toggle.min.js" />
+    <None Include="wwwroot\lib\bootstrap-toggle\js\bootstrap4-toggle.min.js.map" />
+    <None Include="wwwroot\lib\bootstrap\css\bootstrap-grid.css.map" />
+    <None Include="wwwroot\lib\bootstrap\css\bootstrap-grid.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\css\bootstrap-reboot.css.map" />
+    <None Include="wwwroot\lib\bootstrap\css\bootstrap-reboot.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\css\bootstrap.css.map" />
+    <None Include="wwwroot\lib\bootstrap\css\bootstrap.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\js\bootstrap.bundle.js" />
+    <None Include="wwwroot\lib\bootstrap\js\bootstrap.bundle.js.map" />
+    <None Include="wwwroot\lib\bootstrap\js\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\lib\bootstrap\js\bootstrap.bundle.min.js.map" />
+    <None Include="wwwroot\lib\bootstrap\js\bootstrap.js" />
+    <None Include="wwwroot\lib\bootstrap\js\bootstrap.js.map" />
+    <None Include="wwwroot\lib\bootstrap\js\bootstrap.min.js" />
+    <None Include="wwwroot\lib\bootstrap\js\bootstrap.min.js.map" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\css\common.scss" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\css\mixins.scss" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.bootstrap.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.bootstrap.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.bootstrap4.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.bootstrap4.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.colVis.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.colVis.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.flash.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.flash.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.foundation.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.foundation.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.html5.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.html5.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.jqueryui.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.jqueryui.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.print.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.print.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.semanticui.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\buttons.semanticui.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\dataTables.buttons.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\js\dataTables.buttons.min.js" />
+    <None Include="wwwroot\lib\datatables\Buttons-1.5.6\swf\flashExport.swf" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.bootstrap.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.bootstrap.min.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.bootstrap4.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.bootstrap4.min.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.foundation.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.foundation.min.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.jqueryui.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.jqueryui.min.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.semanticui.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\dataTables.semanticui.min.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\jquery.dataTables.js" />
+    <None Include="wwwroot\lib\datatables\DataTables-1.10.18\js\jquery.dataTables.min.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\dataTables.fixedHeader.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\dataTables.fixedHeader.min.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.bootstrap.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.bootstrap.min.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.bootstrap4.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.bootstrap4.min.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.dataTables.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.foundation.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.foundation.min.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.jqueryui.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.jqueryui.min.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.semanicui.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.semanticui.js" />
+    <None Include="wwwroot\lib\datatables\FixedHeader-3.1.4\js\fixedHeader.semanticui.min.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\dataTables.responsive.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\dataTables.responsive.min.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.bootstrap.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.bootstrap.min.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.bootstrap4.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.bootstrap4.min.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.foundation.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.foundation.min.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.jqueryui.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.jqueryui.min.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.semanticui.js" />
+    <None Include="wwwroot\lib\datatables\Responsive-2.2.2\js\responsive.semanticui.min.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\dataTables.rowGroup.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\dataTables.rowGroup.min.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.bootstrap.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.bootstrap.min.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.bootstrap4.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.bootstrap4.min.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.dataTables.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.foundation.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.foundation.min.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.jqueryui.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.jqueryui.min.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.semanicui.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.semanticui.js" />
+    <None Include="wwwroot\lib\datatables\RowGroup-1.1.0\js\rowGroup.semanticui.min.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\dataTables.scroller.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\dataTables.scroller.min.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.bootstrap.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.bootstrap.min.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.bootstrap4.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.bootstrap4.min.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.dataTables.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.foundation.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.foundation.min.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.jqueryui.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.jqueryui.min.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.semanicui.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.semanticui.js" />
+    <None Include="wwwroot\lib\datatables\Scroller-2.0.0\js\scroller.semanticui.min.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\dataTables.select.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\dataTables.select.min.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.bootstrap.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.bootstrap.min.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.bootstrap4.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.bootstrap4.min.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.dataTables.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.foundation.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.foundation.min.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.jqueryui.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.jqueryui.min.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.semanticui.js" />
+    <None Include="wwwroot\lib\datatables\Select-1.3.0\js\select.semanticui.min.js" />
+    <None Include="wwwroot\lib\slickgrid\controls\slick.columnpicker.js" />
+    <None Include="wwwroot\lib\slickgrid\controls\slick.gridmenu.js" />
+    <None Include="wwwroot\lib\slickgrid\controls\slick.pager.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.autotooltips.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.cellcopymanager.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.cellexternalcopymanager.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.cellrangedecorator.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.cellrangeselector.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.cellselectionmodel.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.checkboxselectcolumn.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.draggablegrouping.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.headerbuttons.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.headermenu.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.rowdetailview.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.rowmovemanager.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.rowselectionmodel.js" />
+    <None Include="wwwroot\lib\slickgrid\plugins\slick.state.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\CKey\SearchResult.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Views\FAQ\FAQ.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="wwwroot\robots.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

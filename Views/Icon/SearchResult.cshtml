@@ -1,0 +1,50 @@
+﻿@model IconSearchResultModel
+@{
+    ViewData["Title"] = "Icon Search";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Gateway</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Icon Search</li>
+    </ol>
+</nav>
+
+@if (Model.States != null && Model.States.Count == 100)
+{
+    <div class="alert alert-danger">
+        <strong>Hey!</strong> Your search was limited to 100 results as your query was too broad.
+    </div>
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-auto order-last order-md-2">
+            <center>
+                <div class="row justify-content-center align-items-center">
+                    <form class="form-inline" method="post" asp-controller="Icon" asp-action="SearchIconPost" asp-antiforgery="true">
+                        <div class="form-group mx-sm-3 mb-2">
+                            <input type="text" id="name" placeholder="Regex Query" class="form-control" name="query" value="@Model.SearchQuery"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-2">Search</button>
+                    </form>
+                    <a class="ml-2 text-primary far fa-question-circle mb-2" href="https://scrubby.melonmesa.com/faq#icon-search"></a>
+                </div>
+                @if (Model.States != null)
+                {
+                    <span class="badge badge-success align-top">@Model.States.Count Icons</span>
+                }
+            </center>
+        </div>
+    </div>
+</div>
+@if (Model.States != null)
+{
+    <br/>
+    @foreach (var state in Model.States)
+    {
+        @await Html.PartialAsync("_iconState", state)
+    }
+}

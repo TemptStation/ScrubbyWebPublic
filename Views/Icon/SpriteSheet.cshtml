@@ -1,0 +1,33 @@
+﻿@model DMIViewModel
+@{
+    var pathComponents = Model.File.Name.Split('/', StringSplitOptions.RemoveEmptyEntries);
+    var filename = Model.File.Name.Split('/').Last();
+    ViewData["Title"] = $"{filename}";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Gateway</a>
+        </li>
+        <li class="breadcrumb-item">DMI</li>
+        @for (var i = 0; i < pathComponents.Length - 1; i++)
+        {
+            <li class="breadcrumb-item">@pathComponents[i]</li>
+        }
+        <li class="breadcrumb-item active" aria-current="page">@filename</li>
+    </ol>
+</nav>
+<div>
+    <center>
+        <h1>@filename</h1>
+        <span class="badge badge-success">@Model.States.Count States</span>
+        <a class="badge badge-primary" href="https://github.com/tgstation/tgstation/tree/master/@(string.Join('/', pathComponents))">View on GitHub</a>
+    </center>
+</div>
+<div>
+    @foreach (var state in Model.States)
+    {
+        @await Html.PartialAsync("_iconState", state)
+    }
+</div>

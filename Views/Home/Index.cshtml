@@ -1,0 +1,53 @@
+﻿@using ScrubbyWeb.Controllers
+@model BasicStatsModel
+@{
+    ViewData["Title"] = "Gateway";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Gateway</li>
+    </ol>
+</nav>
+
+<center>
+    <h1>Gateway</h1>
+</center>
+
+<div class="row justify-content-center">
+    <div class="col-4 p-2 border rounded border-primary mb-5">
+        <div class="row justify-content-center">
+            <div class="col-auto border-bottom text-center">
+                <h6 class="text-primary">Latest Rounds</h6>
+            </div>
+        </div>
+        <div class="row justify-content-center mb-2 mt-2">
+            @foreach (var server in Model.LatestRounds)
+            {
+                <div class="col-auto text-center">
+                    @(RoundController.ProperName(server.Item1)): <a asp-controller="Round" asp-action="FetchRound" asp-route-id="@server.Item3">@server.Item3</a>
+                    @if ((DateTime.Now - server.Item2).TotalHours > 3)
+                    {
+                        <i class="fas fa-exclamation-triangle text-warning" data-toggle="tooltip" data-placement="top" title="@($"[LATE] Last log for {RoundController.ProperName(server.Item1)} posted {(DateTime.Now - server.Item2).TotalHours : 0.0} hours ago.")"></i>
+                    }
+                </div>
+            }
+        </div>
+        <div class="row mt-auto mb-auto justify-content-center">
+            <div class="col-auto text-center border-top pt-1">
+                <i class="fas fa-search"></i> Parsed @Model.RoundCount rounds
+            </div>
+            <div class="col-auto text-center border-top pt-1">
+                Storing @Model.FileCount files <i class="far fa-file"></i>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mb-5">
+    <div class="col-xs-auto col-5 text-center">
+        Hello and welcome to Scrubby, or Scrubby13, a personal project by <b class="text-muted">bobbahbrown#0001</b><i class="fab fa-discord text-muted"></i>.
+        <br/>
+        <br/>
+        Feel free to discuss any issues, concerns, or ideas with me through Discord.
+    </div>
+</div>

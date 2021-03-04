@@ -1,0 +1,69 @@
+﻿@model  MongoDMIState
+@{
+    var dirs = Model.Frames.Select(x => x.DirIndex).Distinct().Count();
+    var f_tot = Model.Frames.Count / dirs;
+    string[] dirs_map = {"S", "N", "E", "W", "SE", "SW", "NE", "NW"};
+}
+
+<div class="container row icon-state-container justify-content-center">
+    <div class="col-2">
+        <div class="icon-box">
+            @if (Model.Animated)
+            {
+                <img src="@(Url.Action("GetGif", "Icon", new {id = Model.RenderedAnimations.First()}))" class="checkered dmi-icon"/>
+            }
+            else
+            {
+                <img src="@(Url.Action("GetIcon", "Icon", new {id = Model.Frames.First().File}))" class="checkered dmi-icon"/>
+            }
+        </div>
+    </div>
+    <div class="col-4 icon-details">
+        <div class="row">
+            <div class="col-6">
+                <h4>@Model.Name</h4>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-outline-primary float-right" type="button" data-toggle="collapse" data-target="#a@(Model.StateID)" aria-expanded="false" aria-controls="a@(Model.StateID)">
+                    Dirs
+                </button>
+            </div>
+        </div>
+        <p class="mb-0">
+            <b>File:</b> <a href="@(Context.Request.Scheme)://@(Context.Request.Host)/dmi/@Html.Raw(Model.ParentFile.TrimStart('/'))">@Model.ParentFile</a><br/>
+            <b>Dimensions:</b> @(Model.Frames.First().X) x @(Model.Frames.First().Y)<br/>
+            <b>Directions:</b> @dirs<br/>
+            <b>Frames:</b> @Model.Frames.Count
+            @if (Model.Animated)
+            {
+                <b>Animations:</b>
+                @Model.RenderedAnimations.Count
+            }
+        </p>
+        <div class="collapse" id="a@(Model.StateID)">
+            @for (var dir = 0; dir < dirs; dir++)
+            {
+                <div class="icon-box mt-2 mb-2">
+                    @if (Model.Animated)
+                    {
+                        <div class="icon-box-inner mb-2">
+                            <div class="icon-direction">
+                                @($"{dirs_map[dir]}/GIF")
+                            </div>
+                            <img src="@(Url.Action("GetGif", "Icon", new {id = Model.RenderedAnimations[dir]}))" class="checkered dmi-icon"/>
+                        </div>
+                    }
+                    @for (var frame = 0; frame < f_tot; frame++)
+                    {
+                        <div class="icon-box-inner @(frame != 0 ? "mt-2" : "") @(frame != f_tot - 1 ? "mb-2" : "")">
+                            <div class="icon-direction">
+                                @($"{dirs_map[dir]}/F{frame + 1}")
+                            </div>
+                            <img src="@(Url.Action("GetIcon", "Icon", new {id = Model.Frames[frame + dir * f_tot].File}))" class="checkered dmi-icon"/>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,429 @@
+﻿@using ScrubbyWeb.Controllers
+@using System.Text
+@using ScrubbyCommon.Data
+@model RoundModel
+@{
+    var server = RoundController.ProperName(Model.CurrentRound.Server);
+    var jobColors = new Dictionary<string, string>
+    {
+        {"ai", "button-ai"},
+        {"assistant", "button-assistant"},
+        {"atmospheric technician", "button-engineering"},
+        {"bartender", "button-service"},
+        {"botanist", "button-service"},
+        {"captain", "button-command-head"},
+        {"cargo technician", "button-cargo"},
+        {"chaplain", "button-civilian"},
+        {"chemist", "button-medical"},
+        {"chief engineer", "button-engineering-head"},
+        {"chief medical officer", "button-medical-head"},
+        {"clown", "button-civilian"},
+        {"cook", "button-service"},
+        {"curator", "button-civilian"},
+        {"cyborg", "button-synthetic"},
+        {"detective", "button-security"},
+        {"geneticist", "button-medical"},
+        {"head of personnel", "button-command"},
+        {"head of security", "button-security-head"},
+        {"janitor", "button-service"},
+        {"lawyer", "button-civilian"},
+        {"medical doctor", "button-medical"},
+        {"mime", "button-civilian"},
+        {"quartermaster", "button-cargo-head"},
+        {"research director", "button-research-head"},
+        {"roboticist", "button-research"},
+        {"scientist", "button-research"},
+        {"security officer", "button-security"},
+        {"shaft miner", "button-cargo"},
+        {"station engineer", "button-engineering"},
+        {"virologist", "button-medical"},
+        {"warden", "button-security"},
+        {"paramedic", "button-medical"}
+    };
+    var duration = Model.CurrentRound.Ended - Model.CurrentRound.Timestamp;
+    ViewData["Title"] = $"R{Model.CurrentRound.ID}";
+}
+
+@section AddtoHead{
+    <meta property="og:title" content="@($"R{Model.CurrentRound.ID}")"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" content="https://scrubby.melonmesa.com/images/ScrubbyBar.svg"/>
+    <meta property="og:url" content="https://scrubby.melonmesa.com/round/@Model.CurrentRound.ID"/>
+    <meta property="og:site_name" content="Scrubby"/>
+    @if (!Model.CompletedProcess("Download"))
+    {
+        <meta property="og:description" content="Failed to parse round data for round @Model.CurrentRound.ID on @server."/>
+    }
+    else if (Model.CurrentRound.Players == null)
+    {
+        <meta property="og:description" content="Round in queue for processing: round @Model.CurrentRound.ID on @server."/>
+    }
+    else
+    {
+        <meta property="og:description" content="Parsed round data for round @Model.CurrentRound.ID on @server, featuring @Model.CurrentRound.Players.Count players@(duration.Ticks < 0 ? "." : $", lasting {duration.ToString(@"h\:mm\:ss")}.")"/>
+    }
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Gateway</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">@($"R{Model.CurrentRound.ID}")</li>
+    </ol>
+</nav>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col">
+            @if (Model.LastID != -1)
+            {
+                if (Model.HightlightedCkeys != null && Model.HightlightedCkeys.Any())
+                {
+                    <a href="@Url.Action("FetchRound", "Round", new {id = Model.LastID, h = Model.HightlightedCkeys})" class="btn btn-primary float-left" role="button">
+                        <i class="fas fa-angle-left"></i> @Model.LastID
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Round" asp-action="FetchRound" asp-route-id="@Model.LastID" class="btn btn-primary float-left" role="button">
+                        <i class="fas fa-angle-left"></i> @Model.LastID
+                    </a>
+                }
+            }
+        </div>
+        <div class="col-auto order-last order-md-2">
+            <center>
+                <h1>
+                    @server: <a href="@Model.CurrentRound.BaseURL">@($"R{Model.CurrentRound.ID}")</a>
+                    @if (User.IsInRole("Developer"))
+                    {
+                        <i class="fa fa-link copy-link" data-toggle="tooltip" data-placement="top" data-html="true" title="BBCode Link" data-clipboard-text="([url=@(Context.Request.Host + Url.Action("SourceRedirect", "Round", new {id = Model.CurrentRound.ID}))]src[/url], [url=@(Context.Request.Host + Url.Action("StatbusRedirect", "Round", new {id = Model.CurrentRound.ID}))]statbus[/url], [url=@(Context.Request.Host + Url.Action("FetchRound", "Round", new {id = Model.CurrentRound.ID}))]scrubby[/url])"></i>
+                    }
+                </h1>
+                @if (!Model.CompletedProcess("Download") || Model.CurrentRound.Status.Count == 1)
+                {
+                    <span class="badge badge-warning align-top">Round Unprocessed</span>
+                }
+                else if (!Model.CurrentRound.Status.Any(x => x.Process == "Players" && x.Status == Status.Complete))
+                {
+                    <span class="badge badge-danger align-top">Failed to Parse</span>
+                }
+                else
+                {
+                    <span class="badge badge-success align-top">Parsed Successfully</span>
+                    <span class="badge badge-secondary align-top">@Model.CurrentRound.Players.Count Players</span>
+                    <span class="badge badge-secondary align-top">@Model.CurrentRound.Files.Count Files</span>
+                }
+            </center>
+        </div>
+        <div class="col order-2 order-md-last">
+            @if (Model.NextID != -1)
+            {
+                if (Model.HightlightedCkeys != null && Model.HightlightedCkeys.Any())
+                {
+                    <a href="@Url.Action("FetchRound", "Round", new {id = Model.NextID, h = Model.HightlightedCkeys})" class="btn btn-primary float-right" role="button">
+                        <i class="fas fa-angle-right"></i> @Model.NextID
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Round" asp-action="FetchRound" asp-route-id="@Model.NextID" class="btn btn-primary float-right" role="button">
+                        @Model.NextID <i class="fas fa-angle-right"></i>
+                    </a>
+                }
+            }
+        </div>
+    </div>
+</div>
+<br/>
+<h3>Statistics</h3>
+<table id="stats-table">
+    <tbody>
+    <tr>
+        <td>
+            <p>Time<br/>Data</p>
+        </td>
+        <td>
+            <b>Round started:</b> @Model.CurrentRound.Timestamp
+            @if (duration.Ticks < 0)
+            {
+                <p class="mb-0">
+                    <b>Round ended:</b> Waiting on REP <br/>
+                    <b>Round duration:</b> Waiting on REP
+                </p>
+            }
+            else
+            {
+                <p class="mb-0">
+                    <b>Round ended:</b> @Model.CurrentRound.Ended <br/>
+                    @if ((int) duration.TotalHours > 0)
+                    {
+                        <b>Round duration:</b>
+                        @($"{(int) duration.TotalHours} hours, {duration.Minutes} minutes, and {duration.Seconds} seconds")
+                    }
+                    else
+                    {
+                        <b>Round duration:</b>
+                        @($"{duration.Minutes} minutes, and {duration.Seconds} seconds")
+                    }
+                </p>
+            }
+        </td>
+    </tr>
+    @if (Model.CurrentRound.VersionInfo != null)
+    {
+        <tr>
+            <td>
+                <p>Version</p>
+            </td>
+            <td>
+                <p class="mb-2">
+                    <b>Commit:</b> <a class="btn btn-outline-primary btn-sm" href="@($"https://github.com/tgstation/tgstation/commit/{Model.CurrentRound.VersionInfo.Master}")">@(Model.CurrentRound.VersionInfo.Master.Substring(0, 7))</a>
+                </p>
+                <p class="mb-0">
+                    @if (Model.CurrentRound.VersionInfo.TestMerges.Count > 0)
+                    {
+                        <b>Testmerges: </b>
+                        @foreach (var tm in Model.CurrentRound.VersionInfo.TestMerges)
+                        {
+                            <a class="btn btn-outline-primary btn-sm" href="https://github.com/tgstation/tgstation/pull/@(tm.PR)">@($"#{tm.PR}")</a>
+                        }
+                    }
+                </p>
+            </td>
+        </tr>
+    }
+    <tr>
+        <td>
+            <p>Processes</p>
+        </td>
+        <td>
+            @foreach (var proc in Model.CurrentRound.Status)
+            {
+                <span class="btn btn-sm proc-badge btn-outline-@(proc.Status == Status.Complete ? "success" : "danger") mb-1"
+                      data-toggle="tooltip" data-direction="top" title="@(proc.Message)">
+                    <i class="fas fa-@(proc.Status == Status.Complete ? "check" : "exclamation")"></i> @proc.Process
+                </span>
+            }
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p>Related<br/>Links</p>
+        </td>
+        <td>
+            <p class="mb-0">
+                <small class="fas fa-link"></small> View the <a asp-action="SourceRedirect" asp-route-id="@Model.CurrentRound.ID">original source files</a> <br/>
+                <small class="fas fa-link"></small> View this round on <a asp-action="StatbusRedirect" asp-route-id="@Model.CurrentRound.ID">Atlanta Ned's Statbus</a>
+            </p>
+        </td>
+    </tr>
+    @if (Model.CompletedProcess("Connections"))
+    {
+        <tr id="pop-row">
+            <td>
+                <p>Server<br/>Pop.</p>
+            </td>
+            <td>
+                @await Html.PartialAsync("_PopulationChart", Model.CurrentRound)
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<br/>
+
+@if (Model.CompletedProcess("Players"))
+{
+    <h3>Players</h3>
+    <div>
+        @if (Model.CurrentRound.Files != null && Model.CurrentRound.Players.Any(x => x.Job != null)) // Jobs
+        {
+            @foreach (var department in Model.PlayersByDepartment())
+            {
+                @foreach (var player in department.Value)
+                {
+                    var additions = new StringBuilder();
+                    if (player.Job != null && jobColors.ContainsKey(player.Job))
+                    {
+                        additions.Append($" {jobColors[player.Job]}");
+                    }
+                    if (player.Role != "none")
+                    {
+                        additions.Append(" button-antag");
+                    }
+                    if (Model.HightlightedCkeys.Contains(player.CleanKey))
+                    {
+                        additions.Append(" button-highlight");
+                    }
+
+                    <a asp-controller="CKey" asp-action="FetchCKey" asp-route-ckey="@player.CleanKey" data-html="true" data-toggle="tooltip" class="btn btn-outline-secondary mb-1 stripe-rnd @(additions.ToString())" data-placement="top" title="@player.Ckey [@player.Job]@(player.Role != "none" ? $"<br/>{player.Role}" : "")">@player.Name</a>
+                }
+            }
+        }
+        else
+        {
+            @foreach (var player in Model.CurrentRound.Players.Where(x => x.Role != "none").OrderBy(x => x.Ckey)) // No jobs
+            {
+                var additions = new StringBuilder();
+                if (Model.HightlightedCkeys.Contains(player.CleanKey))
+                {
+                    additions.Append(" button-highlight");
+                }
+                <a asp-controller="CKey" asp-action="FetchCKey" asp-route-ckey="@player.CleanKey" data-toggle="tooltip" class="btn btn-outline-danger mb-1 button-assistant @(additions.ToString())" data-placement="top" title="@player.Ckey [@player.Role]">@player.Name</a>
+            }
+            @foreach (var player in Model.CurrentRound.Players.Where(x => x.Role == "none").OrderBy(x => x.Ckey))
+            {
+                var additions = new StringBuilder();
+                if (Model.HightlightedCkeys.Contains(player.CleanKey))
+                {
+                    additions.Append(" button-highlight");
+                }
+                <a asp-controller="CKey" asp-action="FetchCKey" asp-route-ckey="@player.CleanKey" data-toggle="tooltip" class="btn btn-outline-secondary mb-1 button-assistant @(additions.ToString())" data-placement="top" title="@player.Ckey">@player.Name</a>
+            }
+        }
+
+    </div>
+
+    <br/>
+}
+
+@if (Model.CompletedProcess("Connections"))
+{
+    <h3>Observers</h3>
+    <div>
+        @foreach (var ckey in Model.NonPlaying)
+        {
+            var additions = new StringBuilder();
+            if (Model.HightlightedCkeys.Contains(ckey.Cleaned))
+            {
+                additions.Append(" button-highlight");
+            }
+            <a asp-controller="CKey" asp-action="FetchCKey" asp-route-ckey="@ckey.Cleaned" class="btn btn-outline-secondary mb-1 button-assistant @(additions.ToString())">@ckey.Raw</a>
+        }
+    </div>
+    <br/>
+}
+
+<h3>Files <a class="small text-primary far fa-question-circle" href="https://scrubby.melonmesa.com/faq#files"></a></h3>
+<div>
+    @foreach (var file in Model.CurrentRound.Files)
+    {
+        if (file.FileName.Contains("photos"))
+        {
+        }
+        else if (file.Parsed)
+        {
+            switch (file.FileName)
+            {
+                case "newscaster.json":
+                    <a asp-controller="Newscaster" asp-action="GetRound" asp-route-roundid="@Model.CurrentRound.ID" class="btn btn-outline-primary mb-1" data-placement="top">@file.FileName</a>
+                    break;
+                case "runtime.txt":
+                    <a asp-controller="Runtime" asp-action="GetRound" asp-route-roundID="@Model.CurrentRound.ID" class="btn btn-outline-primary mb-1">@file.FileName</a>
+                    break;
+                default:
+                    <a asp-controller="File" asp-action="FetchFile" asp-route-roundid="@Model.CurrentRound.ID" asp-route-file="@file.FileName" class="btn btn-outline-primary mb-1" data-placement="top">@file.FileName</a>
+                    break;
+            }
+        }
+        else if (file.Failed)
+        {
+            <a class="btn btn-outline-danger mb-1" data-placement="top">@file.FileName</a>
+        }
+        else
+        {
+            <a class="btn btn-outline-secondary mb-1" data-placement="top">@file.FileName</a>
+        }
+    }
+</div>
+@if (Model.CurrentRound.Files.Where(x => x.FileName.Contains("photos")).Any())
+{
+    <br/>
+    <h3>Pictures</h3>
+    <div class="row ml-0 mr-0">
+        @foreach (var file in Model.CurrentRound.Files.Where(x => x.FileName.Contains("photos")))
+        {
+            <div class="card border-secondary mb-1 mr-1">
+                <img class="card-img-top round-photo" src="@Url.Action("FetchImage", "Image", new {id = file._id})" onerror="src = '/images/BrokenFile0Length.png'"/>
+                <div class="card-body">
+                    <p class="card-text text-center">@file.FileName</p>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    img.round-photo {
+        height: auto;
+        image-rendering: pixelated;
+        width: 192px;
+    }
+
+    .fa-check, .fa-exclamation { width: 20px; }
+
+    #stats-table, #stats-table > tbody {
+        display: flex;
+        flex-flow: column;
+    }
+
+    #stats-table {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+    }
+
+    #stats-table > tbody > tr > td:first-child {
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
+        max-width: 100px;
+        min-width: 100px;
+        padding-right: 10px;
+    }
+
+    #stats-table > tbody > tr > td:first-child > p {
+        color: #6c757d;
+        margin-bottom: 0px;
+        text-align: right;
+    }
+
+    #stats-table > tbody > tr > td {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    #stats-table > tbody > tr:first-child { border-top: 0; }
+
+    #stats-table > tbody > tr {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding-bottom: 5px;
+        padding-top: 5px;
+    }
+
+    #stats-table > tbody > tr > td:last-child {
+        flex-grow: 1;
+        min-width: 0;
+        padding-left: 10px;
+        padding-top: 2px;
+    }
+
+    #stats-table > tbody > tr {
+        display: flex;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    #pop-row { min-height: 200px; }
+
+    .btn:hover {
+        background-color: inherit;
+        color: inherit;
+    }
+
+    .proc-badge {
+        padding: 5px;
+        padding-right: 10px;
+    }
+</style>
+
+<script>var clipboard = new ClipboardJS('.copy-link');</script>

@@ -1,0 +1,70 @@
+﻿@model ScrubbyUserModel
+
+@{
+    ViewData["Title"] = $"{Model.User.PhpBBUsername}";
+}
+
+<script>var clipboard = new ClipboardJS('.copy-link');</script>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Gateway</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">@($"{Model.User.PhpBBUsername}")</li>
+    </ol>
+</nav>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-auto mb-3">
+            <center>
+                <h1>@(Model.User.PhpBBUsername)</h1>
+                <a asp-controller="Auth" asp-action="Logout" class="badge badge-warning align-top">Logout</a>
+            </center>
+        </div>
+    </div>
+</div>
+
+<h3>Basic Info</h3>
+<ul class="list-group">
+    <li class="list-group-item list-group-item-action">
+        <div class="container">
+            <div class="row">
+                <div class="col vert-right text-right col-1">
+                    <p class="text-muted mb-0">TG Data</p>
+                </div>
+                <div class="col">
+                    <b>Forum Username: </b> @Model.User.PhpBBUsername <br/>
+                    <b>Byond Key: </b> @Model.User.ByondKey <br/>
+                    <b>Byond CKey: </b> @Model.User.ByondCKey <br/>
+                </div>
+            </div>
+        </div>
+    </li>
+    <li class="list-group-item list-group-item-action">
+        <div class="container">
+            <div class="row">
+                <div class="col vert-right text-right col-1">
+                    <p class="text-muted mb-0">Scrubby Data</p>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <b>Roles: </b> @(string.Join(", ", Model.User.Roles)) <br/>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </li>
+</ul>
+<br/>
+
+<h3>API Keys <a class="small text-primary far fa-question-circle" href="https://scrubby.melonmesa.com/faq#api-endpoint-documentation"></a></h3>
+<div class="row mb-3">
+    <div class="col-12">
+        @foreach (var key in Model.APIKeys)
+        {
+            <a class="btn btn-outline-primary mb-1 copy-link" data-toggle="tooltip" data-html="true" data-placement="top" title="<b>Click to copy API key</b><br />Max Parallel: @key.MaxParallelCalls<br />Max Returned Docs: @key.MaxDocumentsReturned<br />Max Round Range: @key.MaxRoundRange" data-clipboard-text="@key.Key">@key.Key</a>
+        }
+    </div>
+</div>

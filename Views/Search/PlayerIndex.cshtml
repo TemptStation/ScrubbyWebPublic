@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = "Search | Player";
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Gateway</a>
+        </li>
+        <li class="breadcrumb-item" aria-current="page">Search</li>
+        <li class="breadcrumb-item active" aria-current="page">Player</li>
+    </ol>
+</nav>
+<div id="error-container">
+
+</div>
+<form class="form-inline justify-content-center mb-3" id="controls">
+    <input type="text" class="form-control mb-2 mr-sm-2" id="searchText" placeholder="Search Pattern"/>
+    <select class="form-control mb-2 mr-sm-2" id="searchType">
+        <option value="ICName">IC Name</option>
+        <option value="CKey">CKey (BYOND Username)</option>
+    </select>
+    <button class="btn btn-primary mb-2" id="submitSearch">Search</button>
+</form>
+<div id="results" class="hidden">
+    <table class="table table-striped" id="results-table">
+        <thead>
+        <tr>
+            <th class="name-column">Name</th>
+            <th>CKey</th>
+            <th>Instances</th>
+        </tr>
+        </thead>
+        <tbody id="results-table-body">
+
+        </tbody>
+    </table>
+</div>
+
+<script>
+    var firstSearch = true;
+
+    $(document).ready(function() {
+        $('#controls').submit(function(event) {
+            event.preventDefault();
+            submitSearch();
+        });
+    });
+
+    $('#submitSearch').click(function() {
+        submitSearch();
+    });
+
+    function submitSearch() {
+        var searchPattern = $('#searchText').val();
+        var searchType = $('#searchType').val();
+
+        var postObj = {
+            RegexPattern: searchPattern,
+            SearchTypeStr: searchType
+        };
+
+        $('#controls').children().attr('disabled', true);
+
+        var dataResponse = $.ajax({
+            type: "POST",
+            url: "../api/search/player",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            success: function(data) {
+                var dataCont = $('#results-table-body');
+                dataCont.empty();
+
+                if (firstSearch) {
+                    $('#results').removeClass('hidden');
+                    firstSearch = false;
+                }
+
+                if (searchType == 'ICName') {
+                    $('.name-column').show();
+                } else {
+                    $('.name-column').hide();
+                }
+
+                data.forEach(function(elem) {
+                    dataCont.append($(`<tr>${elem.icName == null ? '' : '<td>' + elem.icName + '</td>'}<td>${getCKeyButton(elem.cKey.cleaned)}</td><td>${elem.count}</td></tr>`));
+                });
+            },
+            error: function(data) {
+                $('#error-container').append($(getAlert(data.responseText)));
+            },
+            complete: function() {
+                $('#controls').children().attr('disabled', null);
+            },
+            dataType: "json",
+            data: JSON.stringify(postObj)
+        });
+    }
+
+    function getCKeyButton(ckey) {
+        return '<a class="btn btn-outline-primary mb-1"' +
+            `href="@(Url.Action("FetchCKey", "CKey", new {ckey = "!!REPLACE!!"}).Replace("!!REPLACE!!", "${ckey}"))"` +
+            `>${ckey}</a>`;
+    }
+
+    function getAlert(alertText) {
+        return `<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert">&times;</button>${alertText}</div>`;
+    }
+</script>

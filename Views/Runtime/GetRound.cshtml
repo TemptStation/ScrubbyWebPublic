@@ -1,0 +1,123 @@
+﻿@model  RoundRuntimeModel
+@{
+    var roundID = Model.RoundID;
+    ViewData["Title"] = $"R{roundID} | Runtimes";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Gateway</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-controller="Round" asp-action="FetchRound" asp-route-id="@roundID">@($"R{roundID}")</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Runtimes</li>
+    </ol>
+</nav>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-auto order-last order-md-2">
+            <center>
+                <h1>@($"R{roundID}") - Runtimes</h1>
+                <span class="badge badge-success align-top">@Model.Runtimes.Count runtimes</span>
+            </center>
+        </div>
+    </div>
+</div>
+<br/>
+<div id="runtime-container">
+    @foreach (var runtime in Model.Runtimes)
+    {
+        <div class="card mb-2">
+            <div class="card-header">
+                <i class="fa fa-exclamation-circle"></i> [@runtime.Timestamp.ToString(@"HH:mm:ss")] @runtime.Exception
+            </div>
+            <div class="card-body">
+                Thrown by <code>@runtime.ExceptionAt.Proc (@runtime.ExceptionAt.ProcPath)</code> at <code>@runtime.ExceptionAt.SourceFile, line @runtime.ExceptionAt.Line</code><br/>
+
+                <p class="mb-2 mt-2">
+                    @if (runtime.ExceptionAt.User != null)
+                    {
+                        <b>User:</b>
+                        @($"{runtime.ExceptionAt.User}")<br/>
+                    }
+
+                    @if (runtime.ExceptionAt.UserLocation != null)
+                    {
+                        <b>User Location:</b>
+                        @($"{runtime.ExceptionAt.UserLocation}")<br/>
+                    }
+
+                    @if (runtime.ExceptionAt.Source != null)
+                    {
+                        <b>Source:</b>
+                        @($"{runtime.ExceptionAt.Source}")<br/>
+                    }
+
+                    @if (runtime.ExceptionAt.SourceLocation != null)
+                    {
+                        <b>Source Location:</b>
+                        @($"{runtime.ExceptionAt.SourceLocation}")<br/>
+                    }
+                </p>
+
+                <b>Stacktrace:</b>
+                <div class="ml-3 mr-3 mt-1 codeblock">
+                    <table class="codeblock codeblock-table">
+                        <tbody>
+                        @for (var i = 1; i <= runtime.Stacktrace.Count; i++)
+                        {
+                            var line = runtime.Stacktrace[i - 1];
+                            <tr>
+                                <td class="codeblock codeblock-num">@i</td>
+                                <td class="codeblock codeblock-line">@($"{line}")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    div.codeblock {
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        box-shadow: rgba(0, 0, 0, 0.02) 2px 2px inset;
+    }
+
+    table.codeblock-table { width: 100%; }
+
+    td.codeblock {
+        font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.9em;
+    }
+
+    td.codeblock-num {
+        background-color: rgba(0, 0, 0, 0.10);
+        color: rgba(0, 0, 0, 0.4);
+        min-width: 50px;
+        padding-left: 10px;
+        padding-right: 10px;
+        text-align: right;
+        vertical-align: top;
+        white-space: nowrap;
+    }
+
+    td.codeblock-line {
+        display: flex;
+        flex-direction: row;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    table.codeblock-table > tbody > tr:nth-child(2n) > td.codeblock-line { background-color: rgba(0, 0, 0, 0.05); }
+
+    i.fa-exclamation-circle { color: #e84747; }
+
+    .card-body b { color: #545454; }
+</style>

@@ -1,0 +1,62 @@
+﻿@model NameSearchResultModel
+@{
+    ViewData["Title"] = "Name Search";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Gateway</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Name Search</li>
+    </ol>
+</nav>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-auto order-last order-md-2">
+            <center>
+                <div class="row justify-content-center align-items-center">
+                    <form class="form-inline" method="post" asp-controller="CKey" asp-action="SearchNamePost" asp-antiforgery="true">
+                        <div class="form-group mx-sm-3 mb-2">
+                            <input type="text" id="name" placeholder="IC Player Name" class="form-control" name="name" value="@Model.SearchTerm"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-2">Search</button>
+                    </form>
+                    <a class="ml-2 text-primary far fa-question-circle mb-2" href="https://scrubby.melonmesa.com/faq#ic-name-search"></a>
+                </div>
+                @if (Model.SearchTerm != null)
+                {
+                    <span class="badge badge-success align-top">@Model.Statistics.Count Hits</span>
+                }
+            </center>
+        </div>
+    </div>
+</div>
+@if (Model.SearchTerm != null)
+{
+    <br/>
+    <div class="table-responsive">
+        <table class="table table-striped table-condensed">
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Clean Key</th>
+                <th scope="col">Times Seen</th>
+            </tr>
+            </thead>
+
+            @foreach (var entry in Model.Statistics)
+            {
+                <tr>
+                    <td>@entry.ICName</td>
+                    <td>
+                        <a asp-controller="CKey" asp-action="FetchCKey" asp-route-ckey="@entry.CKey.Cleaned" class="btn btn-outline-primary mb-1">@entry.CKey.Cleaned</a>
+                    </td>
+                    <td>@entry.Count</td>
+                </tr>
+            }
+        </table>
+
+    </div>
+}

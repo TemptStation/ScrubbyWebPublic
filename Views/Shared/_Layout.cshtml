@@ -1,0 +1,120 @@
+﻿@using System.Security.Claims
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - MelonNET</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css"/>
+        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap-grid.css"/>
+        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap-reboot.css"/>
+        <link rel="stylesheet" href="~/lib/bootstrap-toggle/css/bootstrap4-toggle.css"/>
+        <link rel="stylesheet" href="~/lib/font-awesome/css/all.css"/>
+        <link rel="stylesheet" href="~/lib/datatables/datatables.css"/>
+        <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.css"/>
+        <link rel="stylesheet" href="~/lib/tagify/tagify.css"/>
+        <link rel="stylesheet" href="~/lib/slickgrid/css/slick.grid.css"/>
+        <link rel="stylesheet" href="~/css/site.css"/>
+        <link rel="stylesheet" href="~/css/file.css"/>
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true"/>
+    </environment>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/popper.js/popper.js"></script>
+        <script type="text/javascript" src="~/lib/moment/js/moment.js"></script>
+        <script type="text/javascript" src="~/lib/moment/js/moment-duration-format.js"></script>
+        <script type="text/javascript" src="~/lib/chart/js/Chart.js"></script>
+        <script type="text/javascript" src="~/lib/hammer/hammer.min.js"></script>
+        <script type="text/javascript" src="~/lib/chart-zoom/chartjs-plugin-zoom.js"></script>
+        <script type="text/javascript" src="~/lib/infinite-scroll/infinite-scroll.pkgd.min.js"></script>
+        <script type="text/javascript" src="~/lib/chart/js/chartjs-plugin-colorschemes.js"></script>
+        <script type="text/javascript" src="~/lib/d3/d3.js"></script>
+        <script type="text/javascript" src="~/lib/d3/gantt-chart/gantt-chart-d3.js"></script>
+        <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+        <script src="~/lib/bootstrap-toggle/js/bootstrap4-toggle.js"></script>
+        <script type="text/javascript" src="~/lib/tagify/tagify.js"></script>
+        <script src="~/lib/clipboard/clipboard.js"></script>
+        <script type="text/javascript" src="~/lib/datatables/datatables.js"></script>
+        <script type="text/javascript" src="~/lib/jquery-scrollTo/js/jquery.scrollTo.js"></script>
+        <script type="text/javascript" src="~/lib/bootstrap-select/js/bootstrap-select.js"></script>
+        <script type="text/javascript" src="~/lib/slickgrid/js/jquery.event.drag-2.3.0.js"></script>
+        <script type="text/javascript" src="~/lib/slickgrid/js/jquery.event.drop-2.3.0.js"></script>
+        <script type="text/javascript" src="~/lib/slickgrid/js/slick.core.js"></script>
+        <script type="text/javascript" src="~/lib/slickgrid/js/slick.grid.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+    @if (IsSectionDefined("AddToHead"))
+    {
+        @RenderSection("AddToHead", false)
+    }
+</head>
+<body>
+<nav class="navbar navbar-expand-md nav-test navbar-light bg-light">
+    <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">
+        <img src="~/images/ScrubbyBar.svg" height="30" width="113" class="d-inline-block align-self-center"/>
+    </a>
+    <div class="navbar-collapse collapse">
+        <ul class="navbar-nav" id="navigation">
+            <li class="nav-item">
+                <a asp-controller="Home" asp-action="Index" class="nav-link">Home</a>
+            </li>
+            <li class="nav-item">
+                <a asp-controller="Search" asp-action="PlayerIndex" class="nav-link">Player Search</a>
+            </li>
+            <li class="nav-item">
+                <a asp-controller="FAQ" asp-action="Index" class="nav-link">FAQ</a>
+            </li>
+            <li class="nav-item">
+                <a asp-controller="Icon" asp-action="SearchIcon" class="nav-link">Icon Search</a>
+            </li>
+            @if (User.Claims.Where(x => x.Type == ClaimTypes.Role).Where(x => x.Value == "Developer" || x.Value == "TGAdmin" || x.Value == "BetaTester").Any())
+            {
+                <li class="nav-item">
+                    <a asp-controller="Investigate" asp-action="Index" class="nav-link">Investigate</a>
+                </li>
+            }
+            <li class="nav-item">
+                <a asp-controller="FAQ" asp-action="SecurityPolicy" class="nav-link">Data Security Policy <span class="badge-pill badge-info">New</span></a>
+            </li>
+        </ul>
+        @if (User != null && User.Claims.Where(x => x.Type == ClaimTypes.Name).Any())
+        {
+            <a class="navbar-nav ml-auto badge-pill badge-primary" asp-controller="User" asp-action="Me">@User.FindFirst(ClaimTypes.Name).Value</a>
+        }
+        else
+        {
+            <a class="navbar-nav ml-auto badge-pill badge-warning" asp-controller="Auth" asp-action="Login">Login</a>
+            <a class="text-primary far fa-question-circle ml-2" href="https://scrubby.melonmesa.com/faq#logging-in"></a>
+        }
+    </div>
+</nav>
+
+<div class="container body-content">
+    <vc:announcement></vc:announcement>
+    @RenderBody()
+    <hr/>
+    <footer>
+        <center>
+            <p>
+                <small>
+                    No information about your visit is stored or monitored; your anonymity and privacy are respectfully yours.<br/>
+                    <a asp-controller="FAQ" asp-action="SecurityPolicy">You can read more about our (updated) data security policy here.</a><br/><br/>
+                    All content is provided without any guarantee, explicit or implied, of accuracy or permanent access.<br/>
+                    &copy; 2019 - MelonMesa
+                </small>
+            </p>
+        </center>
+    </footer>
+</div>
+
+@RenderSection("Scripts", false)
+</body>
+</html>
