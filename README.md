@@ -7,3 +7,5 @@ This public release does not constitute the entire application, and cannot by it
 This release aims to improve transparency in understanding how Scrubby works, and how it uses the information of users.
 
 If you have any further questions, please contact me on Discord (bobbahbrown#0001).
+
+*Note that this project was largely written several years ago and was pretty much my first ASP.NET project, so there are definitely many spotty parts of the code that haven't been touched in eons. Just a heads up!*
