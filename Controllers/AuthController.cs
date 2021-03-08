@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -47,7 +48,8 @@ namespace ScrubbyWeb.Controllers
                     dynamic rawData = JObject.Parse(stringResult);
                     return new TgSessionResponse
                     {
-                        Status = rawData.status, SessionPrivateToken = rawData.session_private_token,
+                        Status = rawData.status,
+                        SessionPrivateToken = rawData.session_private_token,
                         SessionPublicToken = rawData.session_public_token
                     };
                 }
@@ -105,7 +107,7 @@ namespace ScrubbyWeb.Controllers
         {
             var user = await FinalizeAuthentication();
 
-            if (user == null || user.Status == "error" || user.PhpBBUsername == "null") 
+            if (user == null || user.Status == "error" || user.PhpBBUsername == "null")
                 return View("LoginFailed");
 
             var usersearch = (await _users.FindAsync(x => x.PhpBBUsername == user.PhpBBUsername)).FirstOrDefault();
@@ -132,58 +134,57 @@ namespace ScrubbyWeb.Controllers
 
                     if (update != null) await _users.FindOneAndUpdateAsync(filter, update);
                 }
-                else
-                {
-                    // No existing user, we must create a user record
-                    // Everyone gets a free API key
-                    var toInsert = new ApiKeyModel
-                    {
-                        Name = user.PhpBBUsername,
-                        MaxDocumentsReturned = 100000,
-                        MaxParallelCalls = 2,
-                        MaxRoundRange = 500
-                    };
-
-                    await _apiKeys.InsertOneAsync(toInsert);
-
-                    usersearch = new AuthenticationRecordModel
-                    {
-                        PhpBBUsername = user.PhpBBUsername,
-                        ByondKey = user.ByondKey,
-                        ByondCKey = user.ByondCKey,
-                        Roles = new List<string>
-                        {
-                            "User"
-                        },
-                        APIKeys = new List<ObjectId>
-                        {
-                            toInsert.Key
-                        }
-                    };
-                    await _users.InsertOneAsync(usersearch);
-                }
-
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.PhpBBUsername),
-                    new Claim("CKey", user.ByondCKey)
-                };
-
-                foreach (var role in usersearch.Roles) claims.Add(new Claim(ClaimTypes.Role, role));
-
-                var claimsIdentity = new ClaimsIdentity(
-                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                var authProperties = new AuthenticationProperties
-                {
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddDays(5)
-                };
-
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
             }
+            else
+            {
+                // No existing user, we must create a user record
+                // Everyone gets a free API key
+                var toInsert = new ApiKeyModel
+                {
+                    Name = user.PhpBBUsername,
+                    MaxDocumentsReturned = 100000,
+                    MaxParallelCalls = 2,
+                    MaxRoundRange = 500
+                };
+
+                await _apiKeys.InsertOneAsync(toInsert);
+
+                usersearch = new AuthenticationRecordModel
+                {
+                    PhpBBUsername = user.PhpBBUsername,
+                    ByondKey = user.ByondKey,
+                    ByondCKey = user.ByondCKey,
+                    Roles = new List<string>
+                    {
+                        "User"
+                    },
+                    APIKeys = new List<ObjectId>
+                    {
+                        toInsert.Key
+                    }
+                };
+                await _users.InsertOneAsync(usersearch);
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.PhpBBUsername),
+                new Claim("CKey", user.ByondCKey)
+            };
+            claims.AddRange(usersearch.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+            var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
+            {
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(5)
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
 
             return Redirect(redirectUrl?.ToString() ?? Url.Action("Me", "User"));
         }
