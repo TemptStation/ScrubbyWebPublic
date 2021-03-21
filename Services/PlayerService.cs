@@ -16,12 +16,14 @@ namespace ScrubbyWeb.Services
         private readonly ConnectionService _connectionService;
         private readonly LogMessageService _logService;
         private readonly IMongoCollection<Round> _rounds;
+        private readonly IMongoCollection<ServerConnection> _connections;
         private readonly SuicideService _suicideService;
 
         public PlayerService(MongoAccess client, ConnectionService connectionService, SuicideService suicideService,
             LogMessageService logService)
         {
             _rounds = client.DB.GetCollection<Round>("rounds");
+            _connections = client.DB.GetCollection<ServerConnection>("connections");
             _connectionService = connectionService;
             _suicideService = suicideService;
             _logService = logService;
@@ -31,29 +33,14 @@ namespace ScrubbyWeb.Services
         {
             var bsonRegex = new BsonRegularExpression(regex);
 
-            PipelineDefinition<Round, PlayerNameStatistic> pipeline = new[]
+            PipelineDefinition<ServerConnection, PlayerNameStatistic> pipeline = new[]
             {
                 new BsonDocument("$match", new BsonDocument()
-                    .Add("Players.CleanKey", bsonRegex)),
-                new BsonDocument("$project", new BsonDocument()
-                    .Add("_id", 1.0)
-                    .Add("Players", new BsonDocument()
-                        .Add("$filter", new BsonDocument()
-                            .Add("input", "$Players")
-                            .Add("as", "player")
-                            .Add("cond", new BsonDocument()
-                                .Add("$regexMatch", new BsonDocument()
-                                    .Add("input", "$$player.CleanKey")
-                                    .Add("regex", bsonRegex.Pattern)
-                                    .Add("options", bsonRegex.Options)
-                                )
-                            )
-                        )
-                    )),
-                new BsonDocument("$unwind", new BsonDocument()
-                    .Add("path", "$Players")),
+                    .Add("CKey.Cleaned", bsonRegex)),
                 new BsonDocument("$group", new BsonDocument()
-                    .Add("_id", "$Players.CleanKey")
+                    .Add("_id", new BsonDocument() {{ "ckey", "$CKey.Cleaned" }, { "round", "$RoundID" }})),
+                new BsonDocument("$group", new BsonDocument()
+                    .Add("_id", "$_id.ckey")
                     .Add("count", new BsonDocument()
                         .Add("$sum", 1.0)
                     )),
@@ -64,10 +51,8 @@ namespace ScrubbyWeb.Services
                 new BsonDocument("$sort", new BsonDocument()
                     .Add("Count", -1.0))
             };
-
-            var result = await _rounds.Aggregate(pipeline).ToListAsync();
-
-            return result;
+            
+            return await _connections.Aggregate(pipeline).ToListAsync();;
         }
 
         public async Task<List<PlayerNameStatistic>> SearchForICName(Regex regex)
