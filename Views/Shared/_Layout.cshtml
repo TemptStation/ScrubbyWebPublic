@@ -82,7 +82,7 @@
                 </li>
             }
             <li class="nav-item">
-                <a asp-controller="FAQ" asp-action="SecurityPolicy" class="nav-link">Data Security Policy <span class="badge-pill badge-info">New</span></a>
+                <a asp-controller="FAQ" asp-action="SecurityPolicy" class="nav-link">Data Security Policy</a>
             </li>
         </ul>
         @if (User != null && User.Claims.Where(x => x.Type == ClaimTypes.Name).Any())

@@ -1,8 +1,9 @@
-﻿@using Newtonsoft.Json
+@using Newtonsoft.Json
 @using ScrubbyWeb.Controllers
 @using ScrubbyWeb.Models.Data
 @model CKeyModel
 @{
+    const int daysOfData = 180;
     var i = 0;
     // Player Names Graph
     var namesToGraph = Model.Names.Where(x => x.Item2 > 1);
@@ -40,7 +41,7 @@
 </div>
 
 <!-- Server Connections Graph -->
-<h2>30 Day Activity</h2>
+<h2>@daysOfData Day Activity</h2>
 <div class="row mb-3">
     <div class="col-12">
         <div class="chart-container" style="height: 195px; position: relative; width: 100%;">
@@ -243,7 +244,7 @@
         };
 
         $.ajax({
-            url: "@(Model.Key.Cleaned)/connections",
+            url: "@(Model.Key.Cleaned)/connections?length=@daysOfData",
             type: "POST",
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
@@ -259,9 +260,11 @@
         var srvMap = {};
         var dataMap = [];
         var i = 0;
+        var earliest = moment().startOf('day');
 
         data.forEach(function(elem) {
             elem.server = serverMap[elem.server];
+            earliest = moment.min(earliest, moment(elem.date.split("T")[0]).startOf('day'));
 
             if (srvMap[elem.server] == null) {
                 srvMap[elem.server] = i;
@@ -284,13 +287,22 @@
             }
         });
 
+        if (dataMap.length == 0) {
+            dataMap[0] = [];
+            chartData.datasets[0] = {
+                label: 'No Data',
+                data: []
+            };
+        }
+
         for (var srv = 0; srv < dataMap.length; srv++) {
             dataMap[srv].sort(function(left, right) {
                 return moment.utc(right.x).diff(moment.utc(left.x));
             });
         }
 
-        for (var offset = -1; offset < 30; offset++) {
+        var totalDays = Math.max(moment().diff(earliest, 'days'), @daysOfData);
+        for (var offset = -1; offset <= totalDays; offset++) {
             var thisDay = moment().startOf('day').subtract(offset, 'days');
 
             for (var srv = 0; srv < dataMap.length; srv++) {

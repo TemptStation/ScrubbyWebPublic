@@ -306,7 +306,7 @@ namespace ScrubbyWeb.Controllers
         }
 
         [HttpPost("ckey/{ckey}/connections")]
-        public async Task<IActionResult> GetPast30Days(string ckey)
+        public async Task<IActionResult> GetConnectionData(string ckey, int length = 180)
         {
             if (string.IsNullOrEmpty(ckey))
             {
@@ -314,7 +314,7 @@ namespace ScrubbyWeb.Controllers
             }
 
             var toSearch = new CKey(ckey);
-            var result = await _connService.GetConnectionStatsForCKey(toSearch, DateTime.UtcNow.AddDays(-30));
+            var result = await _connService.GetConnectionStatsForCKey(toSearch, DateTime.UtcNow.AddDays(-1 * Math.Abs(length)));
             return Ok(result);
         }
 
