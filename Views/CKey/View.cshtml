@@ -5,20 +5,21 @@
 @{
     const int daysOfData = 180;
     var i = 0;
+    var byondKey = Model.ByondKey ?? Model.Key.Raw;
     // Player Names Graph
-    var namesToGraph = Model.Names.Where(x => x.Item2 > 1);
-    var namesLabels = JsonConvert.SerializeObject(namesToGraph.Select(x => x.Item1).ToList());
-    var namesValues = JsonConvert.SerializeObject(namesToGraph.Select(x => x.Item2).ToList());
-    ViewData["Title"] = $"{Model.Key.Cleaned}";
+    var namesToGraph = Model.Names.Where(x => x.Count > 1);
+    var namesLabels = JsonConvert.SerializeObject(namesToGraph.Select(x => x.Name).ToList());
+    var namesValues = JsonConvert.SerializeObject(namesToGraph.Select(x => x.Count).ToList());
+    ViewData["Title"] = byondKey;
 }
 
 @section AddtoHead{
-    <meta property="og:title" content="@($"{Model.Key.Cleaned}")"/>
+    <meta property="og:title" content="@($"{byondKey}")"/>
     <meta property="og:type" content="website"/>
     <meta property="og:image" content="https://scrubby.melonmesa.com/images/ScrubbyBar.svg"/>
     <meta property="og:url" content="https://scrubby.melonmesa.com/ckey/@Model.Key.Cleaned"/>
     <meta property="og:site_name" content="Scrubby"/>
-    <meta property="og:description" content="@($"{Model.Names.Count} names seen for {Model.Key.Cleaned} across {Model.Playtime.Sum(x => x.TotalConnections)} connections")"/>
+    <meta property="og:description" content="@($"{Model.Names.Count} names seen for {byondKey} across {Model.Playtime.Sum(x => x.TotalConnections)} connections")"/>
 }
 
 <nav aria-label="breadcrumb">
@@ -26,22 +27,27 @@
         <li class="breadcrumb-item">
             <a asp-controller="Home" asp-action="Index">Gateway</a>
         </li>
-        <li class="breadcrumb-item active" aria-current="page">@($"{Model.Key.Raw}")</li>
+        <li class="breadcrumb-item active" aria-current="page">@byondKey</li>
     </ol>
 </nav>
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-auto">
-            <center>
-                <h1>@Model.Key.Raw</h1>
-            </center>
+        <div class="col-auto" style="text-align: center">
+            <h1>@byondKey</h1>
         </div>
     </div>
 </div>
 
 <!-- Server Connections Graph -->
-<h2>@daysOfData Day Activity</h2>
+<div class="row">
+    <div class="col-9">
+        <h2>@daysOfData Day Activity</h2>
+    </div>
+    <div class="col-3" style="display: flex; flex-direction: column; align-items: flex-end">
+        <button class="btn btn-outline-primary" id="switch-metric">Show Hours</button>
+    </div>
+</div>
 <div class="row mb-3">
     <div class="col-12">
         <div class="chart-container" style="height: 195px; position: relative; width: 100%;">
@@ -58,7 +64,7 @@
         @foreach (var server in Model.Playtime)
         {
             var servername = RoundController.ProperName(server.Server);
-            <button class="tab-button mb-1" data-tab-content="@server.Server">@servername</button>
+            <button class="tab-button mb-1" data-tab-content="@server.Server.Replace(" ", "-")">@servername</button>
         }
     </div>
     <div class="tab-contents col-10">
@@ -78,7 +84,7 @@
         </div>
         @foreach (var server in Model.Playtime)
         {
-            <div class="row hidden" id="@server.Server">
+            <div class="row hidden" id="@server.Server.Replace(" ", "-")">
                 <div class="col-6">
                     <h5>Rounds</h5>
                     <b>Total:</b> @server.TotalConnections rounds <br/>
@@ -103,13 +109,13 @@
         <h5>Also known as...</h5>
         @foreach (var name in Model.Names)
         {
-            if (name.Item2 == 1)
+            if (name.Count == 1)
             {
                 <a class="btn btn-outline-warning mb-1">Hid @(Model.Names.Count - i) singly-used names</a>
                 break;
             }
 
-            <a class="btn btn-outline-secondary mb-1" data-toggle="tooltip" data-placement="top" title="@name.Item2 rounds">@name.Item1</a>
+            <a class="btn btn-outline-secondary mb-1" data-toggle="tooltip" data-placement="top" title="@name.Count rounds">@name.Name</a>
             i++;
         }
     </div>
@@ -192,17 +198,20 @@
 </style>
 
 <script>
-    var infCont = null;
-    var lastDrawn = 999999;
-    var drawing = false;
-    var end = false;
-    var serverMap = {
+    let infCont = null;
+    let lastDrawn = 999999;
+    let drawing = false;
+    let end = false;
+    const serverMap = {
         basil: "Bagil",
         sybil: "Sybil",
         terry: "Terry",
         "event-hall": "Event Hall",
         manuel: "Manuel"
     };
+    let lastData = [];
+    let showHours = false;
+    
     $(document).ready(function() {
         drawRounds(20);
 
@@ -226,20 +235,30 @@
         $('button.tab-button').click(function() {
             clickConnectionCategory(this);
         });
+        
+        $('#switch-metric').click(e => {
+            e.preventDefault();
+            showHours = !showHours;
+            if (showHours)
+                processConnectionHeaderData(lastData, 'hours', 'Hours');
+            else
+                processConnectionHeaderData(lastData, 'count', 'Rounds');
+            $('#switch-metric').text(`Show ${showHours ? 'Rounds' : 'Hours'}`);
+        });
     });
 
     function clickConnectionCategory(target) {
-        var tgt = $(target);
-        var lastServer = $('button.tab-button.active').data('tab-content');
+        let tgt = $(target);
+        let lastServer = $('button.tab-button.active').data('tab-content');
         $('button.tab-button.active').toggleClass('active');
         tgt.toggleClass('active');
-        var thisServer = tgt.data('tab-content');
+        let thisServer = tgt.data('tab-content');
         $('#' + lastServer).toggleClass('active').toggleClass('hidden');
         $('#' + thisServer).toggleClass('active').toggleClass('hidden');
     }
 
     function fetchConnectionHeaderData() {
-        var data = {
+        let data = {
             ckey: "@(Model.Key.Cleaned)"
         };
 
@@ -249,21 +268,22 @@
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: processConnectionHeaderData
+            success: (data) => {
+                lastData = data;
+                processConnectionHeaderData(data, 'count', 'Rounds');
+            }
         });
     }
 
-    function processConnectionHeaderData(data) {
-        var chartData = {
-            datasets: []
-        };
-        var srvMap = {};
-        var dataMap = [];
-        var i = 0;
-        var earliest = moment().startOf('day');
+    function processConnectionHeaderData(data, dataElement, dataLabel) {
+        let chartData = { datasets: [] };
+        let srvMap = {};
+        let dataMap = [];
+        let i = 0;
+        let earliest = moment().startOf('day');
 
         data.forEach(function(elem) {
-            elem.server = serverMap[elem.server];
+            elem.server = serverMap[elem.server] || elem.server;
             earliest = moment.min(earliest, moment(elem.date.split("T")[0]).startOf('day'));
 
             if (srvMap[elem.server] == null) {
@@ -282,12 +302,12 @@
             } else {
                 dataMap[srvMap[elem.server]].push({
                     x: moment(elem.date.split("T")[0]),
-                    y: elem.count
+                    y: elem[dataElement]
                 });
             }
         });
 
-        if (dataMap.length == 0) {
+        if (dataMap.length === 0) {
             dataMap[0] = [];
             chartData.datasets[0] = {
                 label: 'No Data',
@@ -295,17 +315,17 @@
             };
         }
 
-        for (var srv = 0; srv < dataMap.length; srv++) {
+        for (let srv = 0; srv < dataMap.length; srv++) {
             dataMap[srv].sort(function(left, right) {
                 return moment.utc(right.x).diff(moment.utc(left.x));
             });
         }
 
         var totalDays = Math.max(moment().diff(earliest, 'days'), @daysOfData);
-        for (var offset = -1; offset <= totalDays; offset++) {
-            var thisDay = moment().startOf('day').subtract(offset, 'days');
+        for (let offset = -1; offset <= totalDays; offset++) {
+            let thisDay = moment().startOf('day').subtract(offset, 'days');
 
-            for (var srv = 0; srv < dataMap.length; srv++) {
+            for (let srv = 0; srv < dataMap.length; srv++) {
                 var toInsert = null;
                 if (dataMap[srv].length > 0 && dataMap[srv][0].x.isSame(thisDay)) {
                     toInsert = dataMap[srv].shift();
@@ -320,12 +340,17 @@
             }
         }
 
-        drawConnectionsChart(chartData);
+        drawConnectionsChart(chartData, dataLabel);
     }
+    
+    let connectionsChart = null;
 
-    function drawConnectionsChart(data) {
-        var connectionsCtx = document.getElementById('connections-graph-header').getContext('2d');
-        var connectionsChart = new Chart(connectionsCtx,
+    function drawConnectionsChart(data, dataLabel) {
+        if (connectionsChart != null)
+            connectionsChart.destroy();
+        
+        const connectionsCtx = document.getElementById('connections-graph-header').getContext('2d');
+        connectionsChart = new Chart(connectionsCtx,
             {
                 type: 'bar',
                 data: data,
@@ -364,7 +389,7 @@
                                 stacked: true,
                                 scaleLabel: {
                                     display: true,
-                                    labelString: 'Rounds'
+                                    labelString: dataLabel
                                 },
                                 ticks: {
                                     beginAtZero: true,
@@ -386,8 +411,8 @@
     }
 
     function drawNamesChart() {
-        var ctx = document.getElementById('names-graph').getContext('2d');
-        var nameDoughnut = new Chart(ctx,
+        const ctx = document.getElementById('names-graph').getContext('2d');
+        const nameDoughnut = new Chart(ctx,
             {
                 type: 'doughnut',
                 data: {
@@ -416,7 +441,7 @@
     function drawRounds(limit) {
         drawing = true;
 
-        var data = {
+        const data = {
             ckey: "@(Model.Key.Cleaned)",
             startingRound: lastDrawn,
             limit: limit
@@ -433,9 +458,9 @@
     }
 
     function processRoundData(data) {
-        var tgt = $('#rounds');
+        const tgt = $('#rounds');
 
-        if (data.length == 0) {
+        if (data.length === 0) {
             end = true;
         }
 
@@ -445,7 +470,7 @@
                 <tr>
                     <td><a class="btn btn-outline-primary" href="https://scrubby.melonmesa.com/round/${elem.roundID}?h=@(Model.Key.Cleaned)">${elem.roundID}</a></td>
                     <td>${moment.utc(elem.timestamp).format('YYYY-MM-DD HH:mm:ss')}</td>
-                    <td>${serverMap[elem.server]}</td>
+                    <td>${serverMap[elem.server] || elem.server}</td>
                     <td>${elem.name != null ? elem.name : ''}</td>
                     <td>${elem.job != null ? elem.job : ''}</td>
                     <td>

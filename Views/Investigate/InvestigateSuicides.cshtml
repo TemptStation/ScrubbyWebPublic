@@ -252,6 +252,7 @@
     }
 
     function drawData(limit) {
+        toDraw.sort((a, b) => a.roundID - b.roundID);
         var cont = $('#resultsContainer');
         for (i = 0; i < toDraw.length && i < limit; i++) {
             var elem = toDraw.pop();

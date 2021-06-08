@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
 using ScrubbyWeb.Models;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 
 namespace ScrubbyWeb.Controllers
 {
@@ -48,8 +49,7 @@ namespace ScrubbyWeb.Controllers
                     dynamic rawData = JObject.Parse(stringResult);
                     return new TgSessionResponse
                     {
-                        Status = rawData.status,
-                        SessionPrivateToken = rawData.session_private_token,
+                        Status = rawData.status, SessionPrivateToken = rawData.session_private_token,
                         SessionPublicToken = rawData.session_public_token
                     };
                 }
@@ -108,7 +108,7 @@ namespace ScrubbyWeb.Controllers
             var user = await FinalizeAuthentication();
 
             if (user == null || user.Status == "error" || user.PhpBBUsername == "null")
-                return View("LoginFailed");
+                return BadRequest();
 
             var usersearch = (await _users.FindAsync(x => x.PhpBBUsername == user.PhpBBUsername)).FirstOrDefault();
 

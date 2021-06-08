@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 
 namespace ScrubbyWeb.Controllers
 {
@@ -167,12 +168,6 @@ namespace ScrubbyWeb.Controllers
             toGive.NonPlaying = nonPlayers.OrderBy(x => x.Cleaned).ToList();
 
             return View("View", toGive);
-        }
-
-        [HttpGet("round")]
-        public async Task<IActionResult> RoundQuery()
-        {
-            return View("RoundQuery");
         }
 
         public static string ProperName(string server)

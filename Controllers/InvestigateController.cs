@@ -9,6 +9,7 @@ using ScrubbyCommon.Data;
 using ScrubbyWeb.Models.Api;
 using ScrubbyWeb.Models.PostRequests;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,10 +19,10 @@ namespace ScrubbyWeb.Controllers
     public class InvestigateController : Controller
     {
         private readonly IMongoCollection<ServerConnection> _connections;
-        private readonly PlayerService _playerService;
+        private readonly IPlayerService _playerService;
         private readonly IMongoCollection<Round> _rounds;
 
-        public InvestigateController(MongoAccess mongo, PlayerService playerService)
+        public InvestigateController(MongoAccess mongo, IPlayerService playerService)
         {
             _rounds = mongo.DB.GetCollection<Round>("rounds");
             _connections = mongo.DB.GetCollection<ServerConnection>("connections");

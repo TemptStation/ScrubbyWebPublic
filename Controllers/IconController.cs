@@ -10,6 +10,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using ScrubbyWeb.Models;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -30,12 +31,6 @@ namespace ScrubbyWeb.Controllers
             _files = mongo.DB.GetCollection<MongoDMIFile>("scrubby_dmi_file_metadata");
             _DMIFiles = new GridFSBucket(mongo.DB, new GridFSBucketOptions {BucketName = "scrubby_dmi_files"});
             _DMIGifs = new GridFSBucket(mongo.DB, new GridFSBucketOptions {BucketName = "scrubby_dmi_gifs"});
-        }
-
-        [HttpGet("icon/")]
-        public async Task<ActionResult> Index()
-        {
-            return View();
         }
 
         [HttpGet("icon/{id}")]

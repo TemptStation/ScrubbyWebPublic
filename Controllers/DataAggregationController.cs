@@ -11,6 +11,7 @@ using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
 using ScrubbyWeb.Models.Api;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 
 namespace ScrubbyWeb.Controllers
 {

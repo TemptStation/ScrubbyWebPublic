@@ -1,14 +1,14 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ScrubbyWeb.Services;
-using Terryberry.DataProtection.MongoDb;
+using ScrubbyWeb.Services.Mongo;
+using Microsoft.Extensions.Hosting;
+using ScrubbyWeb.Services.SQL;
 
 namespace ScrubbyWeb
 {
@@ -40,14 +40,14 @@ namespace ScrubbyWeb
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().AddNewtonsoftJson();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/login";
                     options.Cookie.Name = "Scrubby";
-                    options.Cookie.Expiration = TimeSpan.FromDays(7);
+                    options.ExpireTimeSpan = TimeSpan.FromDays(7);
                     options.SlidingExpiration = true;
                     options.Cookie.IsEssential = true;
                 })
@@ -57,7 +57,7 @@ namespace ScrubbyWeb
             {
                 options.LoginPath = "/login";
                 options.Cookie.Name = "Scrubby";
-                options.Cookie.Expiration = TimeSpan.FromDays(7);
+                options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;
                 options.Cookie.IsEssential = true;
             });
@@ -65,25 +65,18 @@ namespace ScrubbyWeb
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<MongoAccess>();
-            services.AddSingleton<PlayerService>();
-            services.AddSingleton<SuicideService>();
-            services.AddSingleton<RoundService>();
-            services.AddSingleton<ConnectionService>();
-            services.AddSingleton<RuntimeService>();
-            services.AddSingleton<LogMessageService>();
-            services.AddSingleton<AnnouncementService>();
-
-            var provider = services.BuildServiceProvider();
-
-            services.AddDataProtection()
-                .SetApplicationName("ScrubbyWeb")
-                .SetDefaultKeyLifetime(TimeSpan.FromDays(7))
-                .PersistKeysToMongoDb(provider.GetService<MongoAccess>().DB, "scrubby_dataprotection")
-                .AddKeyCleanup();
+            services.AddTransient<IPlayerService, SqlPlayerService>();
+            services.AddSingleton<ISuicideService, MongoSuicideService>();
+            services.AddSingleton<IRoundService, MongoRoundService>();
+            services.AddTransient<IConnectionService, SqlConnectionService>();
+            services.AddSingleton<IRuntimeService, MongoRuntimeService>();
+            services.AddSingleton<ILogMessageService, MongoLogMessageService>();
+            services.AddSingleton<IAnnouncementService, MongoAnnouncementService>();
+            services.AddTransient<ICKeyService, SqlCKeyService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
@@ -95,13 +88,13 @@ namespace ScrubbyWeb
             app.UseStaticFiles();
             app.UseSession();
             app.UseCookiePolicy();
+            app.UseRouting();
             app.UseAuthentication();
+            app.UseAuthorization();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    "default",
-                    "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

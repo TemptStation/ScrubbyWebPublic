@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using ScrubbyWeb.Models;
 using ScrubbyWeb.Models.PostRequests;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 
 namespace ScrubbyWeb.Controllers
 {
     public class RuntimeController : Controller
     {
-        private readonly RoundService _RoundService;
-        private readonly RuntimeService _RuntimeService;
+        private readonly IRoundService _RoundService;
+        private readonly IRuntimeService _RuntimeService;
 
-        public RuntimeController(RoundService roundService, RuntimeService runtimeService)
+        public RuntimeController(IRoundService roundService, IRuntimeService runtimeService)
         {
             _RoundService = roundService;
             _RuntimeService = runtimeService;

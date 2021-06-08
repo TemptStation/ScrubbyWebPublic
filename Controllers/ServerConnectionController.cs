@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

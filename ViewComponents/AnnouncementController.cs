@@ -1,14 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 
 namespace ScrubbyWeb.ViewComponents
 {
     public class AnnouncementViewComponent : ViewComponent
     {
-        private readonly AnnouncementService _announcements;
+        private readonly IAnnouncementService _announcements;
 
-        public AnnouncementViewComponent(AnnouncementService announce)
+        public AnnouncementViewComponent(IAnnouncementService announce)
         {
             _announcements = announce;
         }

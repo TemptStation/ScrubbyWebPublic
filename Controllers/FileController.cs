@@ -9,6 +9,7 @@ using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
 using ScrubbyWeb.Models.PostRequests;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,9 +19,9 @@ namespace ScrubbyWeb.Controllers
     {
         private static readonly Regex _validRange = new Regex(@"^(?<lower>[0-9]+)-(?<upper>[0-9]+)$");
         private readonly IMongoCollection<LogMessage> _messages;
-        private readonly RoundService _rounds;
+        private readonly IRoundService _rounds;
 
-        public FileController(MongoAccess mongo, RoundService rounds)
+        public FileController(MongoAccess mongo, IRoundService rounds)
         {
             _rounds = rounds;
             _messages = mongo.DB.GetCollection<LogMessage>("logmessages");

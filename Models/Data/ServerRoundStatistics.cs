@@ -7,5 +7,6 @@ namespace ScrubbyWeb.Models.Data
         public string Server { get; set; }
         public DateTime Date { get; set; }
         public int Count { get; set; }
+        public float Hours { get; set; }
     }
 }

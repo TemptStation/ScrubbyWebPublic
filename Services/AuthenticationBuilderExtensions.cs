@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authentication;
+using ScrubbyWeb.Services.Mongo;
 
 namespace ScrubbyWeb.Services
 {
@@ -8,7 +9,7 @@ namespace ScrubbyWeb.Services
         public static AuthenticationBuilder AddAPIKeySupport(this AuthenticationBuilder authenticationBuilder,
             Action<APIKeyAuthenticationOptions> options)
         {
-            return authenticationBuilder.AddScheme<APIKeyAuthenticationOptions, APIKeyAuthenticationHandler>(
+            return authenticationBuilder.AddScheme<APIKeyAuthenticationOptions, MongoAPIKeyAuthenticationHandler>(
                 APIKeyAuthenticationOptions.DefaultScheme, options);
         }
     }

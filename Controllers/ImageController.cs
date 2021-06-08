@@ -8,6 +8,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -15,7 +16,7 @@ using SCD = ScrubbyCommon.Data;
 
 namespace ScrubbyWeb.Controllers
 {
-    public class ImageController
+    public class ImageController : Controller
     {
         private readonly IMongoCollection<SCD.File> _filedata;
         private readonly GridFSBucket _files;

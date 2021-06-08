@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Markdig;
-using Markdig.SyntaxHighlighting;
+using Markdig.Prism;
 using Microsoft.AspNetCore.Mvc;
 using ScrubbyWeb.Models;
 
@@ -15,7 +15,7 @@ namespace ScrubbyWeb.Controllers
         {
             var pipeline = new MarkdownPipelineBuilder()
                 .UseAdvancedExtensions()
-                .UseSyntaxHighlighting()
+                .UsePrism()
                 .UseBootstrap()
                 .Build();
 
@@ -27,7 +27,7 @@ namespace ScrubbyWeb.Controllers
         [ResponseCache(Duration = 300)]
         private static async Task<string> GetFAQMarkdown()
         {
-            return System.IO.File.ReadAllText(@"Views/FAQ/FAQ.md");
+            return await System.IO.File.ReadAllTextAsync(@"Views/FAQ/FAQ.md");
         }
 
         public async Task<IActionResult> SecurityPolicy()

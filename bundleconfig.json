@@ -10,6 +10,7 @@
       "wwwroot/lib/datatables/datatables.min.css",
       "wwwroot/lib/bootstrap-select/css/bootstrap-select.min.css",
       "wwwroot/lib/tagify/tagify.css",
+      "wwwroot/lib/prism/prism.css",
       "wwwroot/css/site.css",
       "wwwroot/css/file.css"
     ],
@@ -49,6 +50,7 @@
       "wwwroot/lib/datatables/datatables.min.js",
       "wwwroot/lib/jquery-scrollTo/js/jquery.scrollTo.min.js",
       "wwwroot/lib/bootstrap-select/js/bootstrap-select.min.js",
+      "wwwroot/lib/prism/prism.js",
       "wwwroot/js/site.js"
     ],
     "minify": {

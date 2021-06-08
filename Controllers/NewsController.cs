@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using ScrubbyWeb.Models;
 using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Mongo;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
