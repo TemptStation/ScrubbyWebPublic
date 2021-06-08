@@ -46,6 +46,9 @@ namespace ScrubbyWeb.Controllers
                 Task.Run(async () => toGive.ByondKey = await _ckey.GetByondKeyAsync(toGive.Key))
             };
             await Task.WhenAll(dataFetch);
+
+            if (!toGive.Playtime.Any())
+                return NotFound();
             
             return View("View", toGive);
         }

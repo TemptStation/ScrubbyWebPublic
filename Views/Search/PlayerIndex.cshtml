@@ -85,7 +85,7 @@
                 }
 
                 data.forEach(function(elem) {
-                    dataCont.append($(`<tr>${elem.icName == null ? '' : '<td>' + elem.icName + '</td>'}<td>${getCKeyButton(elem.cKey.cleaned)}</td><td>${elem.count}</td></tr>`));
+                    dataCont.append($(`<tr>${elem.icName == null ? '' : '<td>' + elem.icName + '</td>'}<td>${getCKeyButton(elem.cKey.raw)}</td><td>${elem.count}</td></tr>`));
                 });
             },
             error: function(data) {

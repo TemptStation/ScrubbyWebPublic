@@ -24,7 +24,7 @@ namespace ScrubbyWeb.Services.SQL
         {
             const string query = @"
                 SELECT
-                    COALESCE(ck.byond_key, ck.ckey) AS RawCKey,
+                    COALESCE(ck.byond_key, ck.ckey) AS CKey,
                     COUNT(*)
                 FROM
                     ckey ck
@@ -32,7 +32,7 @@ namespace ScrubbyWeb.Services.SQL
                 WHERE
                     ck.ckey ~* @regex
                 GROUP BY
-                    ck.ckey
+                    COALESCE(ck.byond_key, ck.ckey)
                 ORDER BY
                     count DESC";
             await using var conn = new NpgsqlConnection(_connectionString);
@@ -44,13 +44,16 @@ namespace ScrubbyWeb.Services.SQL
             const string query = @"
                 SELECT
                     rp.name AS icname,
+                    COALESCE(ck.byond_key, rp.ckey) AS ckey,
                     COUNT(*)
                 FROM
                     round_player rp
+                    LEFT JOIN ckey ck ON ck.ckey = rp.ckey
                 WHERE
                     rp.name ~* @regex
                 GROUP BY
-                    rp.name
+                    rp.name,
+                    COALESCE(ck.byond_key, rp.ckey)
                 ORDER BY
                     count DESC";
             await using var conn = new NpgsqlConnection(_connectionString);
