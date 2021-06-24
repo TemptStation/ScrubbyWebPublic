@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -79,6 +80,52 @@ namespace ScrubbyWeb.Services.Mongo
             }
 
             return toReturn;
+        }
+
+        public async Task<List<ServerConnection>> GetConnectionsForRound(int round, IEnumerable<string> ckeys)
+        {
+            var ckeysList = ckeys.ToList();
+            var parsedCkeys = new List<CKey>();
+            if (ckeysList is {Count: > 0}) 
+                parsedCkeys.AddRange(ckeysList.Select(key => new CKey(key)));
+
+            BsonDocument ckeyFilterOr = null;
+            if (parsedCkeys.Count != 0)
+            {
+                var distinctCKeys = parsedCkeys.Distinct().ToList();
+
+                if (distinctCKeys.Count != 1)
+                {
+                    var innerArray = new BsonArray();
+
+                    foreach (var k in distinctCKeys) innerArray.Add(new BsonDocument().Add("CKey.Cleaned", k.Cleaned));
+
+                    ckeyFilterOr = new BsonDocument().Add("$or", innerArray);
+                }
+                else
+                {
+                    ckeyFilterOr = new BsonDocument().Add("CKey.Cleaned", distinctCKeys.First().Cleaned);
+                }
+            }
+
+            PipelineDefinition<ServerConnection, ServerConnection> pipeline;
+
+            if (ckeyFilterOr != null)
+                pipeline = new[]
+                {
+                    new BsonDocument("$match", new BsonDocument()
+                        .Add("RoundID", round)
+                        .AddRange(ckeyFilterOr))
+                };
+            else
+                pipeline = new[]
+                {
+                    new BsonDocument("$match", new BsonDocument()
+                        .Add("RoundID", round))
+                };
+
+
+            return await _connections.Aggregate(pipeline).ToListAsync();
         }
     }
 }

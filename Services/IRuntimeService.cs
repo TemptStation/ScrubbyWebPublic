@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ScrubbyCommon.Data;
+using ScrubbyWeb.Models.Data;
 
 namespace ScrubbyWeb.Services
 {
     public interface IRuntimeService
     {
-        Task<IEnumerable<Runtime>> GetRuntimesForRound(int roundID);
-
-        Task<IEnumerable<Runtime>> GetRuntimesForCommit(string commitID, DateTime startDate,
-            DateTime endDate);
-
-        Task<IEnumerable<Runtime>> GetRuntimesForPR(int pr, DateTime startDate, DateTime endDate);
+        Task<IEnumerable<ImprovedRuntime>> GetRuntimesForRound(int roundID);
     }
 }

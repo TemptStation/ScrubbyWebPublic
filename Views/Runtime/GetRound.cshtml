@@ -35,31 +35,31 @@
                 <i class="fa fa-exclamation-circle"></i> [@runtime.Timestamp.ToString(@"HH:mm:ss")] @runtime.Exception
             </div>
             <div class="card-body">
-                Thrown by <code>@runtime.ExceptionAt.Proc (@runtime.ExceptionAt.ProcPath)</code> at <code>@runtime.ExceptionAt.SourceFile, line @runtime.ExceptionAt.Line</code><br/>
+                Thrown by <code>@runtime.Proc (@runtime.ProcPath)</code> at <code>@runtime.SourceFile, line @runtime.Line</code><br/>
 
                 <p class="mb-2 mt-2">
-                    @if (runtime.ExceptionAt.User != null)
+                    @if (runtime.User != null)
                     {
                         <b>User:</b>
-                        @($"{runtime.ExceptionAt.User}")<br/>
+                        @($"{runtime.User}")<br/>
                     }
 
-                    @if (runtime.ExceptionAt.UserLocation != null)
+                    @if (runtime.UserLocation != null)
                     {
                         <b>User Location:</b>
-                        @($"{runtime.ExceptionAt.UserLocation}")<br/>
+                        @($"{runtime.UserLocation}")<br/>
                     }
 
-                    @if (runtime.ExceptionAt.Source != null)
+                    @if (runtime.Source != null)
                     {
                         <b>Source:</b>
-                        @($"{runtime.ExceptionAt.Source}")<br/>
+                        @($"{runtime.Source}")<br/>
                     }
 
-                    @if (runtime.ExceptionAt.SourceLocation != null)
+                    @if (runtime.SourceLocation != null)
                     {
                         <b>Source Location:</b>
-                        @($"{runtime.ExceptionAt.SourceLocation}")<br/>
+                        @($"{runtime.SourceLocation}")<br/>
                     }
                 </p>
 
@@ -67,12 +67,11 @@
                 <div class="ml-3 mr-3 mt-1 codeblock">
                     <table class="codeblock codeblock-table">
                         <tbody>
-                        @for (var i = 1; i <= runtime.Stacktrace.Count; i++)
+                        @foreach (var line in runtime.Stacktrace)
                         {
-                            var line = runtime.Stacktrace[i - 1];
                             <tr>
-                                <td class="codeblock codeblock-num">@i</td>
-                                <td class="codeblock codeblock-line">@($"{line}")</td>
+                                <td class="codeblock codeblock-num">@(line.Index + 1)</td>
+                                <td class="codeblock codeblock-line">@(line.Line)</td>
                             </tr>
                         }
                         </tbody>

@@ -69,7 +69,7 @@ namespace ScrubbyWeb
             services.AddSingleton<ISuicideService, MongoSuicideService>();
             services.AddSingleton<IRoundService, MongoRoundService>();
             services.AddTransient<IConnectionService, SqlConnectionService>();
-            services.AddSingleton<IRuntimeService, MongoRuntimeService>();
+            services.AddSingleton<IRuntimeService, SqlRuntimeService>();
             services.AddSingleton<ILogMessageService, MongoLogMessageService>();
             services.AddSingleton<IAnnouncementService, MongoAnnouncementService>();
             services.AddTransient<ICKeyService, SqlCKeyService>();

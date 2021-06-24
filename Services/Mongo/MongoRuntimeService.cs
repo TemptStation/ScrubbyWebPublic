@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using ScrubbyCommon.Data;
+using ScrubbyWeb.Models.Data;
 
 namespace ScrubbyWeb.Services.Mongo
 {
@@ -19,44 +20,10 @@ namespace ScrubbyWeb.Services.Mongo
             _rounds = client.DB.GetCollection<Round>("rounds");
         }
 
-        public async Task<IEnumerable<Runtime>> GetRuntimesForRound(int roundID)
+        public async Task<IEnumerable<ImprovedRuntime>> GetRuntimesForRound(int roundID)
         {
-            return await _runtimes.Find(x => x.Round == roundID).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Runtime>> GetRuntimesForCommit(string commitID, DateTime startDate,
-            DateTime endDate)
-        {
-            PipelineDefinition<Round, Round> roundPipeline = new[]
-            {
-                new BsonDocument("$match", new BsonDocument()
-                    .Add("VersionInfo.Master", commitID)
-                    .Add("Timestamp", new BsonDocument()
-                        .Add("$gte", new BsonDateTime(startDate))
-                        .Add("$lte", new BsonDateTime(endDate))
-                    )),
-                new BsonDocument("$project", new BsonDocument()
-                    .Add("_id", 1.0))
-            };
-            var applicableRounds = (await _rounds.Aggregate(roundPipeline).ToListAsync()).Select(x => x.ID);
-            return await _runtimes.Find(x => applicableRounds.Contains(x.Round)).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Runtime>> GetRuntimesForPR(int pr, DateTime startDate, DateTime endDate)
-        {
-            PipelineDefinition<Round, Round> roundPipeline = new[]
-            {
-                new BsonDocument("$match", new BsonDocument()
-                    .Add("VersionInfo.TestMerges.PR", pr)
-                    .Add("Timestamp", new BsonDocument()
-                        .Add("$gte", new BsonDateTime(startDate))
-                        .Add("$lte", new BsonDateTime(endDate))
-                    )),
-                new BsonDocument("$project", new BsonDocument()
-                    .Add("_id", 1.0))
-            };
-            var applicableRounds = (await _rounds.Aggregate(roundPipeline).ToListAsync()).Select(x => x.ID);
-            return await _runtimes.Find(x => applicableRounds.Contains(x.Round)).ToListAsync();
+            return (await _runtimes.Find(x => x.Round == roundID).ToListAsync())
+                .Select(ImprovedRuntime.FromRuntime);
         }
     }
 }

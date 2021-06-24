@@ -31,19 +31,5 @@ namespace ScrubbyWeb.Controllers
                 Version = round.VersionInfo
             });
         }
-
-        [HttpPost("api/da/runtimes/pr")]
-        public async Task<IActionResult> GetRuntimesForPR([FromBody] RuntimeSearchPostModel<int> model)
-        {
-            var result = await _RuntimeService.GetRuntimesForPR(model.Data, model.StartDate, model.EndDate);
-            return Ok(result);
-        }
-
-        [HttpPost("api/da/runtimes/commit")]
-        public async Task<IActionResult> GetRuntimesForPR([FromBody] RuntimeSearchPostModel<string> model)
-        {
-            var result = await _RuntimeService.GetRuntimesForCommit(model.Data, model.StartDate, model.EndDate);
-            return Ok(result);
-        }
     }
 }

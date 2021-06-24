@@ -9,5 +9,6 @@ namespace ScrubbyWeb.Services
     public interface IConnectionService
     {
         Task<List<ServerRoundStatistic>> GetConnectionStatsForCKey(CKey ckey, DateTime startDate);
+        Task<List<ServerConnection>> GetConnectionsForRound(int round, IEnumerable<string> ckeys);
     }
 }

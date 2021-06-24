@@ -40,5 +40,26 @@ namespace ScrubbyWeb.Services.SQL
             await using var conn = new NpgsqlConnection(_connectionString);
             return (await conn.QueryAsync<ServerRoundStatistic>(query, new {ckey = ckey.Cleaned, startDate})).ToList();
         }
+
+        public async Task<List<ServerConnection>> GetConnectionsForRound(int round, IEnumerable<string> ckeys)
+        {
+            const string query = @"
+                SELECT
+                    c.round AS RoundID,
+                    c.ckey,
+                    c.connect_time AS ConnectTime,
+                    c.disconnect_time AS DisconnectTime,
+                    c.byond_version AS ByondVersion,
+                    s.display AS server
+                FROM
+                    connection c
+                    INNER JOIN round r ON r.id = c.round
+                    INNER JOIN server s ON s.id = r.server
+                WHERE
+                    c.round = @round
+                    AND c.ckey = ANY(@ckeys)";
+            await using var conn = new NpgsqlConnection(_connectionString);
+            return (await conn.QueryAsync<ServerConnection>(query, new {round, ckeys})).ToList();
+        }
     }
 }
