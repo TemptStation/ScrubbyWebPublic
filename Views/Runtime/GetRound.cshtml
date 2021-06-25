@@ -21,65 +21,18 @@
         <div class="col-auto order-last order-md-2">
             <center>
                 <h1>@($"R{roundID}") - Runtimes</h1>
-                <span class="badge badge-success align-top">@Model.Runtimes.Count runtimes</span>
+                <span id="runtime-count-container" class="hidden badge badge-success align-top"><span id="runtime-count">???</span> runtimes</span>
             </center>
+        </div>
+    </div>
+    <div id="loading-container" class="row justify-content-center">
+        <div class="col-auto">
+            Loading...
         </div>
     </div>
 </div>
 <br/>
 <div id="runtime-container">
-    @foreach (var runtime in Model.Runtimes)
-    {
-        <div class="card mb-2">
-            <div class="card-header">
-                <i class="fa fa-exclamation-circle"></i> [@runtime.Timestamp.ToString(@"HH:mm:ss")] @runtime.Exception
-            </div>
-            <div class="card-body">
-                Thrown by <code>@runtime.Proc (@runtime.ProcPath)</code> at <code>@runtime.SourceFile, line @runtime.Line</code><br/>
-
-                <p class="mb-2 mt-2">
-                    @if (runtime.User != null)
-                    {
-                        <b>User:</b>
-                        @($"{runtime.User}")<br/>
-                    }
-
-                    @if (runtime.UserLocation != null)
-                    {
-                        <b>User Location:</b>
-                        @($"{runtime.UserLocation}")<br/>
-                    }
-
-                    @if (runtime.Source != null)
-                    {
-                        <b>Source:</b>
-                        @($"{runtime.Source}")<br/>
-                    }
-
-                    @if (runtime.SourceLocation != null)
-                    {
-                        <b>Source Location:</b>
-                        @($"{runtime.SourceLocation}")<br/>
-                    }
-                </p>
-
-                <b>Stacktrace:</b>
-                <div class="ml-3 mr-3 mt-1 codeblock">
-                    <table class="codeblock codeblock-table">
-                        <tbody>
-                        @foreach (var line in runtime.Stacktrace)
-                        {
-                            <tr>
-                                <td class="codeblock codeblock-num">@(line.Index + 1)</td>
-                                <td class="codeblock codeblock-line">@(line.Line)</td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    }
 </div>
 
 <style>
@@ -120,3 +73,65 @@
 
     .card-body b { color: #545454; }
 </style>
+
+<script>
+    $(document).ready(() => {
+        loadData();
+    });
+    
+    const loadData = () => {
+        $.ajax({
+            url: "@Url.Action("GetRuntimesForRound", "Runtime", new { round = @Model.RoundID })",
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: (data) => {
+                renderData(data);
+            }
+        });
+    };
+    
+    const renderData = (data) => {
+        $('#loading-container').hide();
+        $('#runtime-count').text(data.length);
+        $('#runtime-count-container').toggleClass('hidden');
+        $('#runtime-container').append($(data.map(x => `
+            <div class="card mb-2">
+                <div class="card-header">
+                    <i class="fa fa-exclamation-circle"></i> [${moment.utc(x.timestamp).format('HH:mm:ss')}] ${x.exception}
+                </div>
+                <div class="card-body">
+                    Thrown by <code>${x.proc} (${x.procPath})</code> at <code>${x.sourceFile}, line ${x.line}</code><br/>
+        
+                    <p class="mb-2 mt-2">
+                        ${x.user && `<b>User:</b> ${renderAtom(x.user)}<br/>` || ''}
+                        ${x.userLocation && `<b>User Location:</b> ${renderAtom(x.userLocation)}<br/>` || ''}
+                        ${x.source && `<b>Source:</b> ${renderAtom(x.source)}<br/>` || ''}
+                        ${x.sourceLocation && `<b>Source Location:</b> ${renderAtom(x.sourceLocation)}<br/>` || ''}
+                    </p>
+        
+                    <b>Stacktrace:</b>
+                    <div class="ml-3 mr-3 mt-1 codeblock">
+                        <table class="codeblock codeblock-table">
+                            <tbody>
+                            ${x.stacktrace.map(y => `<tr><td class="codeblock codeblock-num">${y.index + 1}</td><td class="codeblock codeblock-line">${y.line}</td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `).join('')));
+    };
+    
+    const renderAtom = (atom) => {
+        if (atom === null)
+            return null;
+        let result = atom.name;
+        if (atom.typePath !== null)
+            result += ` (${atom.typePath})`
+        if (atom.x !== null)
+            result += ` (${atom.x}, ${atom.y}, ${atom.z})`;
+        result.trim();
+        return result;
+    };
+</script>

@@ -8,6 +8,5 @@ namespace ScrubbyWeb.Models
     {
         public int RoundID { get; set; }
         public RoundBuildInfo Version { get; set; }
-        public List<ImprovedRuntime> Runtimes { get; set; }
     }
 }

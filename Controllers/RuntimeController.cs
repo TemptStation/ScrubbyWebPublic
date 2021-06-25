@@ -10,26 +10,30 @@ namespace ScrubbyWeb.Controllers
 {
     public class RuntimeController : Controller
     {
-        private readonly IRoundService _RoundService;
-        private readonly IRuntimeService _RuntimeService;
+        private readonly IRoundService _roundService;
+        private readonly IRuntimeService _runtimeService;
 
         public RuntimeController(IRoundService roundService, IRuntimeService runtimeService)
         {
-            _RoundService = roundService;
-            _RuntimeService = runtimeService;
+            _roundService = roundService;
+            _runtimeService = runtimeService;
         }
 
-        [HttpGet("round/{roundID}/runtimes")]
-        public async Task<IActionResult> GetRound(int roundID)
+        [HttpGet("round/{round:int}/runtimes")]
+        public async Task<IActionResult> GetRound(int round)
         {
-            var round = await _RoundService.GetRound(roundID);
-            var runtimes = await _RuntimeService.GetRuntimesForRound(roundID);
+            var dbRound = await _roundService.GetRound(round);
             return View(new RoundRuntimeModel
             {
-                RoundID = round.ID,
-                Runtimes = runtimes.ToList(),
-                Version = round.VersionInfo
+                RoundID = dbRound.ID,
+                Version = dbRound.VersionInfo
             });
+        }
+
+        [HttpGet("api/runtime/{round:int}")]
+        public async Task<IActionResult> GetRuntimesForRound(int round)
+        {
+            return Ok(await _runtimeService.GetRuntimesForRound(round));
         }
     }
 }

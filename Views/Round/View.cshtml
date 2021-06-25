@@ -321,7 +321,7 @@
                     <a asp-controller="Newscaster" asp-action="GetRound" asp-route-roundid="@Model.CurrentRound.ID" class="btn btn-outline-primary mb-1" data-placement="top">@file.FileName</a>
                     break;
                 case "runtime.txt":
-                    <a asp-controller="Runtime" asp-action="GetRound" asp-route-roundID="@Model.CurrentRound.ID" class="btn btn-outline-primary mb-1">@file.FileName</a>
+                    <a asp-controller="Runtime" asp-action="GetRound" asp-route-round="@Model.CurrentRound.ID" class="btn btn-outline-primary mb-1">@file.FileName</a>
                     break;
                 default:
                     <a asp-controller="File" asp-action="FetchFile" asp-route-roundid="@Model.CurrentRound.ID" asp-route-file="@file.FileName" class="btn btn-outline-primary mb-1" data-placement="top">@file.FileName</a>
