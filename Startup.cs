@@ -71,7 +71,7 @@ namespace ScrubbyWeb
             services.AddTransient<IConnectionService, SqlConnectionService>();
             services.AddSingleton<IRuntimeService, SqlRuntimeService>();
             services.AddSingleton<ILogMessageService, MongoLogMessageService>();
-            services.AddSingleton<IAnnouncementService, MongoAnnouncementService>();
+            services.AddSingleton<IAnnouncementService, SqlAnnouncementService>();
             services.AddTransient<ICKeyService, SqlCKeyService>();
         }
 
@@ -83,7 +83,7 @@ namespace ScrubbyWeb
             else
                 app.UseHsts();
 
-            app.UseStatusCodePagesWithRedirects("/error/{0}");
+            app.UseStatusCodePagesWithReExecute("/error/{0}");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSession();

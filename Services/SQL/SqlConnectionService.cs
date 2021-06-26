@@ -4,19 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models.Data;
 
 namespace ScrubbyWeb.Services.SQL
 {
-    public class SqlConnectionService : IConnectionService
+    public class SqlConnectionService : SqlServiceBase, IConnectionService
     {
-        private readonly string _connectionString;
-
-        public SqlConnectionService(IConfiguration configuration)
+        public SqlConnectionService(IConfiguration configuration) : base(configuration)
         {
-            _connectionString = configuration.GetConnectionString("mn3");
         }
         
         public async Task<List<ServerRoundStatistic>> GetConnectionStatsForCKey(CKey ckey, DateTime startDate)
@@ -37,7 +33,7 @@ namespace ScrubbyWeb.Services.SQL
                 GROUP BY
                     s.display,
                     r.starttime::date";
-            await using var conn = new NpgsqlConnection(_connectionString);
+            await using var conn = GetConnection();
             return (await conn.QueryAsync<ServerRoundStatistic>(query, new {ckey = ckey.Cleaned, startDate})).ToList();
         }
 
@@ -58,7 +54,7 @@ namespace ScrubbyWeb.Services.SQL
                 WHERE
                     c.round = @round
                     AND c.ckey = ANY(@ckeys)";
-            await using var conn = new NpgsqlConnection(_connectionString);
+            await using var conn = GetConnection();
             return (await conn.QueryAsync<ServerConnection>(query, new {round, ckeys})).ToList();
         }
     }

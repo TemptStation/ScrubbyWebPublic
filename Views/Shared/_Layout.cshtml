@@ -1,6 +1,7 @@
 ﻿@using System.Security.Claims
+@using System.Reflection
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -55,13 +56,13 @@
     </environment>
     @if (IsSectionDefined("AddToHead"))
     {
-        @RenderSection("AddToHead", false)
+        @await RenderSectionAsync("AddToHead", false)
     }
 </head>
 <body>
 <nav class="navbar navbar-expand-md nav-test navbar-light bg-light">
     <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">
-        <img src="~/images/ScrubbyBar.svg" height="30" width="113" class="d-inline-block align-self-center"/>
+        <img src="~/images/ScrubbyBar.svg" height="30" width="113" class="d-inline-block align-self-center" alt="scrubby logo"/>
     </a>
     <div class="navbar-collapse collapse">
         <ul class="navbar-nav" id="navigation">
@@ -77,19 +78,25 @@
             <li class="nav-item">
                 <a asp-controller="Icon" asp-action="SearchIcon" class="nav-link">Icon Search</a>
             </li>
-            @if (User.Claims.Where(x => x.Type == ClaimTypes.Role).Where(x => x.Value == "Developer" || x.Value == "TGAdmin" || x.Value == "BetaTester").Any())
+            @if (User.Claims.Where(x => x.Type == ClaimTypes.Role).Any(x => x.Value is "Developer" or "TGAdmin" or "BetaTester"))
             {
                 <li class="nav-item">
                     <a asp-controller="Investigate" asp-action="Index" class="nav-link">Investigate</a>
                 </li>
             }
+            @if (User.IsInRole("Developer"))
+                        {
+                            <li class="nav-item">
+                                <a asp-controller="Announcement" asp-action="ManageAnnouncements" class="nav-link">Announcements</a>
+                            </li>
+                        }
             <li class="nav-item">
                 <a asp-controller="FAQ" asp-action="SecurityPolicy" class="nav-link">Data Security Policy</a>
             </li>
         </ul>
-        @if (User != null && User.Claims.Where(x => x.Type == ClaimTypes.Name).Any())
+        @if (User != null && User.Claims.Any(x => x.Type == ClaimTypes.Name))
         {
-            <a class="navbar-nav ml-auto badge-pill badge-primary" asp-controller="User" asp-action="Me">@User.FindFirst(ClaimTypes.Name).Value</a>
+            <a class="navbar-nav ml-auto badge-pill badge-primary" asp-controller="User" asp-action="Me">@User.FindFirst(ClaimTypes.Name)?.Value</a>
         }
         else
         {
@@ -100,23 +107,23 @@
 </nav>
 
 <div class="container body-content">
-    <vc:announcement></vc:announcement>
+    <vc:announcement />
     @RenderBody()
     <hr/>
     <footer>
-        <center>
+        <div style="text-align: center;">
             <p>
                 <small>
                     No information about your visit is stored or monitored; your anonymity and privacy are respectfully yours.<br/>
-                    <a asp-controller="FAQ" asp-action="SecurityPolicy">You can read more about our (updated) data security policy here.</a><br/><br/>
+                    <a asp-controller="FAQ" asp-action="SecurityPolicy">You can read more about our data security policy here.</a><br/><br/>
                     All content is provided without any guarantee, explicit or implied, of accuracy or permanent access.<br/>
-                    &copy; 2021 - MelonMesa - <a href="https://github.com/bobbahbrown/ScrubbyWebPublic">View source on GitHub <i class="fab fa-github"></i></a>
+                    &copy; 2021 - MelonMesa - v@(Program.Version) - <a href="https://github.com/bobbahbrown/ScrubbyWebPublic">View source on GitHub <i class="fab fa-github"></i></a>
                 </small>
             </p>
-        </center>
+        </div>
     </footer>
 </div>
 
-@RenderSection("Scripts", false)
+@await RenderSectionAsync("Scripts", false)
 </body>
 </html>

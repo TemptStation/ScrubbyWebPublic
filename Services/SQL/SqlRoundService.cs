@@ -3,19 +3,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models.CommonRounds;
 
 namespace ScrubbyWeb.Services.SQL
 {
-    public class SqlRoundService : IRoundService
+    public class SqlRoundService : SqlServiceBase, IRoundService
     {
-        private readonly string _connectionString;
-
-        public SqlRoundService(IConfiguration configuration)
+        public SqlRoundService(IConfiguration configuration) : base(configuration)
         {
-            _connectionString = configuration.GetConnectionString("mn3");
         }
         
         public async Task<Round> GetRound(int id)
@@ -50,7 +46,7 @@ namespace ScrubbyWeb.Services.SQL
                     INNER JOIN round r ON r.id = cr.round
                 ORDER BY
                     r.id ASC";
-            await using var conn = new NpgsqlConnection(_connectionString);
+            await using var conn = GetConnection();
             return (await conn.QueryAsync<CommonRoundModel>(query, new
             {
                 ckeys, 

@@ -5,19 +5,15 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
 
 namespace ScrubbyWeb.Services.SQL
 {
-    public class SqlPlayerService : IPlayerService
+    public class SqlPlayerService : SqlRoundService, IPlayerService
     {
-        private readonly string _connectionString;
-
-        public SqlPlayerService(IConfiguration configuration)
+        public SqlPlayerService(IConfiguration configuration) : base(configuration)
         {
-            _connectionString = configuration.GetConnectionString("mn3");
         }
         
         public async Task<List<PlayerNameStatistic>> SearchForCKey(Regex regex)
@@ -35,7 +31,7 @@ namespace ScrubbyWeb.Services.SQL
                     COALESCE(ck.byond_key, ck.ckey)
                 ORDER BY
                     count DESC";
-            await using var conn = new NpgsqlConnection(_connectionString);
+            await using var conn = GetConnection();
             return (await conn.QueryAsync<PlayerNameStatistic>(query, new {regex = regex.ToString()})).ToList();
         }
 
@@ -56,7 +52,7 @@ namespace ScrubbyWeb.Services.SQL
                     COALESCE(ck.byond_key, rp.ckey)
                 ORDER BY
                     count DESC";
-            await using var conn = new NpgsqlConnection(_connectionString);
+            await using var conn = GetConnection();
             return (await conn.QueryAsync<PlayerNameStatistic>(query, new {regex = regex.ToString()})).ToList();
         }
 
@@ -103,7 +99,7 @@ namespace ScrubbyWeb.Services.SQL
                     LEFT JOIN server s ON s.id = r.server
                     LEFT JOIN round_player rp ON rp.round = r.id AND rp.ckey = r_init.ckey";
 
-            await using var conn = new NpgsqlConnection(_connectionString);
+            await using var conn = GetConnection();
             return (await conn.QueryAsync<RoundReceipt>(query, new { ckey = ckey.Cleaned, startingRound, limit })).ToList();
         }
 
@@ -159,7 +155,7 @@ namespace ScrubbyWeb.Services.SQL
                     LEFT JOIN server s ON s.id = r.server
                     LEFT JOIN round_player rp ON rp.round = r.id AND rp.ckey = r_init.ckey";
 
-            await using var conn = new NpgsqlConnection(_connectionString);
+            await using var conn = GetConnection();
             return (await conn.QueryAsync<RoundReceipt>(query, new { ckey = ckey.Cleaned, startDate, endDate })).ToList();
         }
     }

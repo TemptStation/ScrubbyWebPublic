@@ -1,21 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
 using ScrubbyWeb.Models.Data;
 
 namespace ScrubbyWeb.Services.SQL
 {
-    public class SqlRuntimeService : IRuntimeService
+    public class SqlRuntimeService : SqlServiceBase, IRuntimeService
     {
-        private readonly string _connectionString;
-
-        public SqlRuntimeService(IConfiguration configuration)
+        public SqlRuntimeService(IConfiguration configuration) : base(configuration)
         {
-            _connectionString = configuration.GetConnectionString("mn3");
         }
 
         public async Task<IEnumerable<ImprovedRuntime>> GetRuntimesForRound(int roundID)
@@ -75,9 +70,9 @@ namespace ScrubbyWeb.Services.SQL
                     selected_runtimes rt
                     INNER JOIN stacktrace st ON st.parent = rt.id;";
 
-            await using var conn = new NpgsqlConnection(_connectionString);
+            await using var conn = GetConnection();
             await conn.OpenAsync(); // manually open connection so we can use temp tables between queries
-            
+
             // Get runtimes
             var results = new Dictionary<long, ImprovedRuntime>();
             await conn
@@ -95,22 +90,25 @@ namespace ScrubbyWeb.Services.SQL
                             runtime.UserLocation = usrloc;
                             results[id] = runtime;
                         }
+
                         return results[id];
-                    }, new { round = roundID }, splitOn: "timestamp, typepath, typepath, typepath, typepath");
-            
+                    }, new {round = roundID}, splitOn: "timestamp, typepath, typepath, typepath, typepath");
+
             // Get stacktrace entries to tie to runtimes
-            await conn.QueryAsync<long, ImprovedStacktrace, ImprovedStacktrace>(stacktraceQuery, (runtimeId, stacktrace) =>
-            {
-                results[runtimeId].Stacktrace.Add(stacktrace);
-                return stacktrace;
-            }, splitOn: "index");
-            
+            await conn.QueryAsync<long, ImprovedStacktrace, ImprovedStacktrace>(stacktraceQuery,
+                (runtimeId, stacktrace) =>
+                {
+                    results[runtimeId].Stacktrace.Add(stacktrace);
+                    return stacktrace;
+                }, splitOn: "index");
+
             // Ensure that stacktraces are ordered correctly
             var toReturn = results.Select(x => x.Value).ToList();
             foreach (var runtime in toReturn)
             {
                 runtime.Stacktrace.Sort((a, b) => a.Index - b.Index);
             }
+
             return toReturn;
         }
     }

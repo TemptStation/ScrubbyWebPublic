@@ -1,13 +1,13 @@
 ﻿using System;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace ScrubbyWeb.Models.Data
 {
-    [BsonIgnoreExtraElements]
     public class ScrubbyAnnouncement
     {
-        public DateTime Active { get; set; }
-        public DateTime Expires { get; set; }
+        public int Id { get; set; }
+        public DateTime? Start { get; set; }
+        public DateTime? End { get; set; }
         public string Message { get; set; }
+        public bool Active { get; set; }
     }
 }

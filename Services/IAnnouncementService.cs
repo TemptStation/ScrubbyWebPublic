@@ -6,6 +6,9 @@ namespace ScrubbyWeb.Services
 {
     public interface IAnnouncementService
     {
-        Task<List<ScrubbyAnnouncement>> GetAnnouncements();
+        Task<List<ScrubbyAnnouncement>> GetAnnouncements(bool onlyActive = true);
+        Task<ScrubbyAnnouncement> CreateAnnouncement(ScrubbyAnnouncement announcement);
+        Task<ScrubbyAnnouncement> UpdateAnnouncement(ScrubbyAnnouncement announcement);
+        Task<bool> DeleteAnnouncement(ScrubbyAnnouncement announcement);
     }
 }
