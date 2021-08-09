@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using ScrubbyWeb.Models.Data;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Services.SQL
 {

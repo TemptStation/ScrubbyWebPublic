@@ -5,6 +5,7 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models.CommonRounds;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Services.SQL
 {
@@ -13,7 +14,7 @@ namespace ScrubbyWeb.Services.SQL
         public SqlRoundService(IConfiguration configuration) : base(configuration)
         {
         }
-        
+
         public async Task<Round> GetRound(int id)
         {
             throw new System.NotImplementedException();

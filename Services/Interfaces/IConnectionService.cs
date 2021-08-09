@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models.Data;
 
-namespace ScrubbyWeb.Services
+namespace ScrubbyWeb.Services.Interfaces
 {
     public interface IConnectionService
     {

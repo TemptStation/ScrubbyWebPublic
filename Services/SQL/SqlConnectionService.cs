@@ -6,6 +6,7 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models.Data;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Services.SQL
 {
@@ -14,7 +15,7 @@ namespace ScrubbyWeb.Services.SQL
         public SqlConnectionService(IConfiguration configuration) : base(configuration)
         {
         }
-        
+
         public async Task<List<ServerRoundStatistic>> GetConnectionStatsForCKey(CKey ckey, DateTime startDate)
         {
             const string query = @"

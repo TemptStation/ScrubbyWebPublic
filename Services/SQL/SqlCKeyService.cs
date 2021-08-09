@@ -1,20 +1,25 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
 using ScrubbyWeb.Models.Data;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Services.SQL
 {
     public class SqlCKeyService : SqlServiceBase, ICKeyService
     {
-        public SqlCKeyService(IConfiguration configuration) : base(configuration)
-        {
-        }
+        private readonly BYONDDataService _byond;
         
+        public SqlCKeyService(IConfiguration configuration, BYONDDataService byond) : base(configuration)
+        {
+            _byond = byond;
+        }
+
         public async Task<List<NameCountRecord>> GetNamesForCKeyAsync(CKey ckey)
         {
             const string query = @"
@@ -67,6 +72,50 @@ namespace ScrubbyWeb.Services.SQL
             const string query = @"SELECT ck.byond_key FROM ckey ck WHERE ck.ckey = @ckey";
             await using var conn = GetConnection();
             return (await conn.QueryAsync<string>(query, new { ckey = ckey.Cleaned })).FirstOrDefault();
+        }
+
+        public async Task<SqlCKey> GetKeyDetailsAsync(string ckey, bool requestIfNotFound = false)
+        {
+            const string query = @"
+                SELECT
+                    ck.ckey,
+                    ck.byond_key AS byondkey,
+                    ck.joined_byond AS joinedbyond,
+                    ck.user_not_found AS usernotfound,
+                    ck.user_inactive AS userinactive
+                FROM
+                    ckey ck
+                WHERE
+                    ck.ckey = @ckey";
+            await using var conn = GetConnection();
+            var result = (await conn.QueryAsync<SqlCKey>(query, new {ckey})).FirstOrDefault();
+
+            if (result != null || !requestIfNotFound) return result;
+            
+            // Try to request the data from BYOND if necessary when not found
+            result = new SqlCKey()
+            {
+                CKey = SqlCKey.SanitizeKey(ckey)
+            };
+            try
+            {
+                var data = await _byond.GetUserData(ckey, CancellationToken.None);
+                if (data != null)
+                {
+                    result.JoinedBYOND = data.Joined;
+                    result.ByondKey = data.Key;
+                }
+            }
+            catch (BYONDUserNotFoundException)
+            {
+                result.UserNotFound = true;
+            }
+            catch (BYONDUserInactiveException)
+            {
+                result.UserInactive = true;
+            }
+
+            return result;
         }
     }
 }

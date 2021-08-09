@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ScrubbyWeb.Models;
-using ScrubbyWeb.Models.PostRequests;
-using ScrubbyWeb.Services;
-using ScrubbyWeb.Services.Mongo;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Controllers
 {

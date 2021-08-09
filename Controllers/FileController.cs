@@ -8,7 +8,7 @@ using MongoDB.Driver;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
 using ScrubbyWeb.Models.PostRequests;
-using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Interfaces;
 using ScrubbyWeb.Services.Mongo;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860

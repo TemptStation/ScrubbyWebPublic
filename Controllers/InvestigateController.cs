@@ -5,16 +5,16 @@ using ScrubbyCommon.Data;
 using ScrubbyWeb.Models.Api;
 using ScrubbyWeb.Models.CommonRounds;
 using ScrubbyWeb.Models.PostRequests;
-using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Controllers
 {
     [Authorize(Roles = "Developer,TGAdmin,BetaTester")]
     public class InvestigateController : Controller
     {
+        private readonly IConnectionService _connectionService;
         private readonly IPlayerService _playerService;
         private readonly IRoundService _roundService;
-        private readonly IConnectionService _connectionService;
 
         public InvestigateController(IPlayerService playerService, IRoundService roundService, IConnectionService connectionService)
         {

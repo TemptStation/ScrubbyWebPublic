@@ -10,7 +10,7 @@ namespace ScrubbyWeb
         public static string Version = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException())
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion;
-        
+
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Build().Run();

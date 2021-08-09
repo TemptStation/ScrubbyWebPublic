@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using ScrubbyCommon.Data;
-using ScrubbyWeb.Models.Data;
+﻿using ScrubbyCommon.Data;
 
 namespace ScrubbyWeb.Models
 {

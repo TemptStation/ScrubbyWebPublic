@@ -5,13 +5,14 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models.CommonRounds;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Services.Mongo
 {
     public class MongoRoundService : IRoundService
     {
-        private readonly IMongoCollection<Round> _rounds;
         private readonly IMongoCollection<ServerConnection> _connections;
+        private readonly IMongoCollection<Round> _rounds;
 
         public MongoRoundService(MongoAccess client)
         {

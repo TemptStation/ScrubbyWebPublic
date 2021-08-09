@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
-using ScrubbyWeb.Services;
 using ScrubbyWeb.Services.Mongo;
 
 namespace ScrubbyWeb.Controllers

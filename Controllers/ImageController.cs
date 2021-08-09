@@ -7,7 +7,6 @@ using MimeMapping;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
-using ScrubbyWeb.Services;
 using ScrubbyWeb.Services.Mongo;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;

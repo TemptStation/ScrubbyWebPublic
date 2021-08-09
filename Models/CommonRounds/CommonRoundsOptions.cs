@@ -1,5 +1,3 @@
-using System;
-
 namespace ScrubbyWeb.Models.CommonRounds
 {
     public class CommonRoundsOptions

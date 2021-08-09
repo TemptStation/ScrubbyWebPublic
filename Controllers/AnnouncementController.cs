@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ScrubbyWeb.Models.Data;
-using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Controllers
 {

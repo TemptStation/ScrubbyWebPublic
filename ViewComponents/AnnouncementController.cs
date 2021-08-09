@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using ScrubbyWeb.Services;
-using ScrubbyWeb.Services.Mongo;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.ViewComponents
 {

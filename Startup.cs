@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ScrubbyWeb.Services;
-using ScrubbyWeb.Services.Mongo;
 using Microsoft.Extensions.Hosting;
+using ScrubbyWeb.Services;
+using ScrubbyWeb.Services.Interfaces;
+using ScrubbyWeb.Services.Mongo;
 using ScrubbyWeb.Services.SQL;
 
 namespace ScrubbyWeb
@@ -50,8 +51,7 @@ namespace ScrubbyWeb
                     options.ExpireTimeSpan = TimeSpan.FromDays(7);
                     options.SlidingExpiration = true;
                     options.Cookie.IsEssential = true;
-                })
-                .AddAPIKeySupport(options => { });
+                });
 
             services.ConfigureApplicationCookie(options =>
             {
@@ -66,13 +66,14 @@ namespace ScrubbyWeb
 
             services.AddSingleton<MongoAccess>();
             services.AddTransient<IPlayerService, SqlPlayerService>();
-            services.AddSingleton<ISuicideService, MongoSuicideService>();
+            services.AddSingleton<ISuicideService, SqlSuicideService>();
             services.AddSingleton<IRoundService, MongoRoundService>();
             services.AddTransient<IConnectionService, SqlConnectionService>();
             services.AddSingleton<IRuntimeService, SqlRuntimeService>();
-            services.AddSingleton<ILogMessageService, MongoLogMessageService>();
             services.AddSingleton<IAnnouncementService, SqlAnnouncementService>();
             services.AddTransient<ICKeyService, SqlCKeyService>();
+            services.AddTransient<IUserService, MongoUserService>();
+            services.AddTransient<BYONDDataService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

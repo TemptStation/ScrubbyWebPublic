@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ScrubbyWeb.Models.PostRequests;
-using ScrubbyWeb.Services;
-using ScrubbyWeb.Services.Mongo;
+using ScrubbyWeb.Services.Interfaces;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

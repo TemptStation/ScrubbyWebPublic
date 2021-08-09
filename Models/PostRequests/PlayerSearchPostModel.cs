@@ -16,6 +16,7 @@ namespace ScrubbyWeb.Models.PostRequests
         {
             set => Regex = new Regex(value, RegexOptions.IgnoreCase);
         }
+
         public Regex Regex { get; set; }
 
         public string SearchTypeStr
@@ -28,6 +29,7 @@ namespace ScrubbyWeb.Models.PostRequests
                 }
             }
         }
+
         public PlayerSearchType SearchType { get; set; }
     }
 }

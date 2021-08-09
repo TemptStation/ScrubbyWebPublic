@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using ScrubbyCommon.Data;
 
 namespace ScrubbyWeb.Models.Data
 {
     public class ImprovedRuntime
     {
+        private string _procPath;
         public DateTime Timestamp { get; set; }
         public string Exception { get; set; }
         public string Proc { get; private set; }
-        private string _procPath;
+
         public string ProcPath
         {
             get => _procPath;

@@ -1,26 +1,20 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
-using ScrubbyWeb.Models.Data;
 using ScrubbyWeb.Models.PostRequests;
-using ScrubbyWeb.Services;
-using ScrubbyWeb.Services.Mongo;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Controllers
 {
     public class CKeyController : Controller
     {
+        private readonly ICKeyService _ckey;
         private readonly IConnectionService _connService;
         private readonly IPlayerService _players;
         private readonly ISuicideService _suicides;
-        private readonly ICKeyService _ckey;
 
         public CKeyController(IPlayerService players, ISuicideService suicides, IConnectionService connService, 
             ICKeyService ckey)

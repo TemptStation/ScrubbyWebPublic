@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ScrubbyWeb.Models.Data;
 
-namespace ScrubbyWeb.Services
+namespace ScrubbyWeb.Services.Interfaces
 {
     public interface IAnnouncementService
     {

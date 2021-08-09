@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
 
-namespace ScrubbyWeb.Services
+namespace ScrubbyWeb.Services.Interfaces
 {
     public interface IPlayerService
     {

@@ -10,28 +10,22 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
-using ScrubbyWeb.Models;
-using ScrubbyWeb.Services;
-using ScrubbyWeb.Services.Mongo;
+using ScrubbyWeb.Models.Data;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly IMongoCollection<ApiKeyModel> _apiKeys;
-
         private readonly string _httpSafeSecretToken;
-        private readonly IMongoCollection<AuthenticationRecordModel> _users;
+        private readonly IUserService _users;
 
-        public AuthController(IConfiguration config, MongoAccess mongo)
+        public AuthController(IConfiguration config, IUserService users)
         {
             var secretToken = config.GetSection("SecretTokens").GetSection("tgauthapi").Value;
             _httpSafeSecretToken = HttpUtility.UrlEncode(secretToken);
-            _users = mongo.DB.GetCollection<AuthenticationRecordModel>("scrubby_users");
-            _apiKeys = mongo.DB.GetCollection<ApiKeyModel>("scrubby_api_keys");
+            _users = users;
         }
 
         private async Task<TgSessionResponse> InitializeAuthHandshake()
@@ -109,69 +103,24 @@ namespace ScrubbyWeb.Controllers
 
             if (user == null || user.Status == "error" || user.PhpBBUsername == "null")
                 return BadRequest();
-
-            var usersearch = (await _users.FindAsync(x => x.PhpBBUsername == user.PhpBBUsername)).FirstOrDefault();
-
-            if (usersearch != null)
+            
+            var foundUser = await _users.GetUser(user.PhpBBUsername) ?? await _users.CreateUser(new ScrubbyUser()
             {
-                var filter =
-                    Builders<AuthenticationRecordModel>.Filter.Eq(x => x.PhpBBUsername, usersearch.PhpBBUsername);
-                UpdateDefinition<AuthenticationRecordModel> update = null;
-
-                if (usersearch.APIKeys == null || usersearch.APIKeys.Count < 0)
+                PhpBBUsername = user.PhpBBUsername,
+                ByondKey = user.ByondKey,
+                ByondCKey = user.ByondCKey,
+                Roles = new List<string>
                 {
-                    // Needs more API key!
-                    var toInsert = new ApiKeyModel
-                    {
-                        Name = usersearch.PhpBBUsername,
-                        MaxDocumentsReturned = 100000,
-                        MaxParallelCalls = 2,
-                        MaxRoundRange = 500
-                    };
-
-                    await _apiKeys.InsertOneAsync(toInsert);
-                    update = Builders<AuthenticationRecordModel>.Update.Push(x => x.APIKeys, toInsert.Key);
-
-                    if (update != null) await _users.FindOneAndUpdateAsync(filter, update);
+                    "User"
                 }
-            }
-            else
-            {
-                // No existing user, we must create a user record
-                // Everyone gets a free API key
-                var toInsert = new ApiKeyModel
-                {
-                    Name = user.PhpBBUsername,
-                    MaxDocumentsReturned = 100000,
-                    MaxParallelCalls = 2,
-                    MaxRoundRange = 500
-                };
-
-                await _apiKeys.InsertOneAsync(toInsert);
-
-                usersearch = new AuthenticationRecordModel
-                {
-                    PhpBBUsername = user.PhpBBUsername,
-                    ByondKey = user.ByondKey,
-                    ByondCKey = user.ByondCKey,
-                    Roles = new List<string>
-                    {
-                        "User"
-                    },
-                    APIKeys = new List<ObjectId>
-                    {
-                        toInsert.Key
-                    }
-                };
-                await _users.InsertOneAsync(usersearch);
-            }
+            });
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.PhpBBUsername),
                 new Claim("CKey", user.ByondCKey)
             };
-            claims.AddRange(usersearch.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            claims.AddRange(foundUser.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var claimsIdentity = new ClaimsIdentity(
                 claims, CookieAuthenticationDefaults.AuthenticationScheme);

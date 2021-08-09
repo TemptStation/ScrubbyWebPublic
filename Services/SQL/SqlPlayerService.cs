@@ -7,6 +7,7 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using ScrubbyCommon.Data;
 using ScrubbyWeb.Models;
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Services.SQL
 {
@@ -15,7 +16,7 @@ namespace ScrubbyWeb.Services.SQL
         public SqlPlayerService(IConfiguration configuration) : base(configuration)
         {
         }
-        
+
         public async Task<List<PlayerNameStatistic>> SearchForCKey(Regex regex)
         {
             const string query = @"
