@@ -1,9 +1,9 @@
-﻿@using ScrubbyWeb.Controllers
 @using System.Text
 @using ScrubbyCommon.Data
+@using System.Globalization
 @model RoundModel
 @{
-    var server = RoundController.ProperName(Model.CurrentRound.Server);
+    const string timePattern = @"yyyy-MM-dd HH:mm:ss";
     var jobColors = new Dictionary<string, string>
     {
         {"ai", "button-ai"},
@@ -40,27 +40,27 @@
         {"warden", "button-security"},
         {"paramedic", "button-medical"}
     };
-    var duration = Model.CurrentRound.Ended - Model.CurrentRound.Timestamp;
-    ViewData["Title"] = $"R{Model.CurrentRound.ID}";
+    var duration = Model.CurrentRound.EndTime - Model.CurrentRound.StartTime;
+    ViewData["Title"] = $"R{Model.CurrentRound.Id}";
 }
 
 @section AddtoHead{
-    <meta property="og:title" content="@($"R{Model.CurrentRound.ID}")"/>
+    <meta property="og:title" content="@($"R{Model.CurrentRound.Id}")"/>
     <meta property="og:type" content="website"/>
     <meta property="og:image" content="https://scrubby.melonmesa.com/images/ScrubbyBar.svg"/>
-    <meta property="og:url" content="https://scrubby.melonmesa.com/round/@Model.CurrentRound.ID"/>
+    <meta property="og:url" content="https://scrubby.melonmesa.com/round/@Model.CurrentRound.Id"/>
     <meta property="og:site_name" content="Scrubby"/>
     @if (!Model.CompletedProcess("Download"))
     {
-        <meta property="og:description" content="Failed to parse round data for round @Model.CurrentRound.ID on @server."/>
+        <meta property="og:description" content="Failed to parse round data for round @Model.CurrentRound.Id on @Model.CurrentRound.Server"/>
     }
     else if (Model.CurrentRound.Players == null)
     {
-        <meta property="og:description" content="Round in queue for processing: round @Model.CurrentRound.ID on @server."/>
+        <meta property="og:description" content="Round in queue for processing: round @Model.CurrentRound.Id on @Model.CurrentRound.Server."/>
     }
     else
     {
-        <meta property="og:description" content="Parsed round data for round @Model.CurrentRound.ID on @server, featuring @Model.CurrentRound.Players.Count players@(duration.Ticks < 0 ? "." : $", lasting {duration.ToString(@"h\:mm\:ss")}.")"/>
+        <meta property="og:description" content="Parsed round data for round @Model.CurrentRound.Id on @Model.CurrentRound.Server playing @Model.CurrentRound.Map, featuring @Model.CurrentRound.Players.Count players@(duration?.Ticks < 0 ? "." : $", lasting {duration?.ToString(@"h\:mm\:ss")}.")"/>
     }
 }
 
@@ -69,7 +69,7 @@
         <li class="breadcrumb-item">
             <a asp-controller="Home" asp-action="Index">Gateway</a>
         </li>
-        <li class="breadcrumb-item active" aria-current="page">@($"R{Model.CurrentRound.ID}")</li>
+        <li class="breadcrumb-item active" aria-current="page">@($"R{Model.CurrentRound.Id}")</li>
     </ol>
 </nav>
 
@@ -95,17 +95,17 @@
         <div class="col-auto order-last order-md-2">
             <center>
                 <h1>
-                    @server: <a href="@Model.CurrentRound.BaseURL">@($"R{Model.CurrentRound.ID}")</a>
+                    @Model.CurrentRound.Server: <a href="@Model.CurrentRound.BaseURL">@($"R{Model.CurrentRound.Id}")</a>
                     @if (User.IsInRole("Developer"))
                     {
-                        <i class="fa fa-link copy-link" data-toggle="tooltip" data-placement="top" data-html="true" title="BBCode Link" data-clipboard-text="([url=@(Context.Request.Host + Url.Action("SourceRedirect", "Round", new {id = Model.CurrentRound.ID}))]src[/url], [url=@(Context.Request.Host + Url.Action("StatbusRedirect", "Round", new {id = Model.CurrentRound.ID}))]statbus[/url], [url=@(Context.Request.Host + Url.Action("FetchRound", "Round", new {id = Model.CurrentRound.ID}))]scrubby[/url])"></i>
+                        <i class="fa fa-link copy-link" data-toggle="tooltip" data-placement="top" data-html="true" title="BBCode Link" data-clipboard-text="([url=@(Context.Request.Host + Url.Action("SourceRedirect", "Round", new {id = Model.CurrentRound.Id}))]src[/url], [url=@(Context.Request.Host + Url.Action("StatbusRedirect", "Round", new {id = Model.CurrentRound.Id}))]statbus[/url], [url=@(Context.Request.Host + Url.Action("FetchRound", "Round", new {id = Model.CurrentRound.Id}))]scrubby[/url])"></i>
                     }
                 </h1>
                 @if (!Model.CompletedProcess("Download") || Model.CurrentRound.Status.Count == 1)
                 {
                     <span class="badge badge-warning align-top">Round Unprocessed</span>
                 }
-                else if (!Model.CurrentRound.Status.Any(x => x.Process == "Players" && x.Status == Status.Complete))
+                else if (!Model.CurrentRound.Status.Any(x => x.Process == "Round Players" && x.Status == Status.Complete))
                 {
                     <span class="badge badge-danger align-top">Failed to Parse</span>
                 }
@@ -123,7 +123,7 @@
                 if (Model.HightlightedCkeys != null && Model.HightlightedCkeys.Any())
                 {
                     <a href="@Url.Action("FetchRound", "Round", new {id = Model.NextID, h = Model.HightlightedCkeys})" class="btn btn-primary float-right" role="button">
-                        <i class="fas fa-angle-right"></i> @Model.NextID
+                        @Model.NextID <i class="fas fa-angle-right"></i>
                     </a>
                 }
                 else
@@ -142,30 +142,39 @@
     <tbody>
     <tr>
         <td>
+            <p>Game Data</p>
+        </td>
+        <td>
+            <b>Map:</b> @Model.CurrentRound.Map <br/>
+            <b>Map loaded in:</b> @(Model.CurrentRound.MapLoadingSeconds) seconds
+        </td>
+    </tr>
+    <tr>
+        <td>
             <p>Time<br/>Data</p>
         </td>
         <td>
-            <b>Round started:</b> @Model.CurrentRound.Timestamp
-            @if (duration.Ticks < 0)
+            <b>Server started:</b> @Model.CurrentRound.StartTime.ToString(timePattern, CultureInfo.InvariantCulture)<br/>
+            @if (duration?.Ticks < 0)
             {
                 <p class="mb-0">
-                    <b>Round ended:</b> Waiting on REP <br/>
+                    <b>Server shutdown:</b> Waiting on REP <br/>
                     <b>Round duration:</b> Waiting on REP
                 </p>
             }
             else
             {
                 <p class="mb-0">
-                    <b>Round ended:</b> @Model.CurrentRound.Ended <br/>
-                    @if ((int) duration.TotalHours > 0)
+                    <b>Server shutdown:</b> @Model.CurrentRound.EndTime?.ToString(timePattern, CultureInfo.InvariantCulture) <br/>
+                    @if ((int) duration?.TotalHours > 0)
                     {
                         <b>Round duration:</b>
-                        @($"{(int) duration.TotalHours} hours, {duration.Minutes} minutes, and {duration.Seconds} seconds")
+                        @($"{(int) duration?.TotalHours} hours, {duration?.Minutes} minutes, and {duration?.Seconds} seconds")
                     }
                     else
                     {
                         <b>Round duration:</b>
-                        @($"{duration.Minutes} minutes, and {duration.Seconds} seconds")
+                        @($"{duration?.Minutes} minutes, and {duration?.Seconds} seconds")
                     }
                 </p>
             }
@@ -214,8 +223,8 @@
         </td>
         <td>
             <p class="mb-0">
-                <small class="fas fa-link"></small> View the <a asp-action="SourceRedirect" asp-route-id="@Model.CurrentRound.ID">original source files</a> <br/>
-                <small class="fas fa-link"></small> View this round on <a asp-action="StatbusRedirect" asp-route-id="@Model.CurrentRound.ID">Atlanta Ned's Statbus</a>
+                <small class="fas fa-link"></small> View the <a asp-action="SourceRedirect" asp-route-id="@Model.CurrentRound.Id">original source files</a> <br/>
+                <small class="fas fa-link"></small> View this round on <a asp-action="StatbusRedirect" asp-route-id="@Model.CurrentRound.Id">Atlanta Ned's Statbus</a>
             </p>
         </td>
     </tr>
@@ -234,7 +243,7 @@
 </table>
 <br/>
 
-@if (Model.CompletedProcess("Players"))
+@if (Model.CompletedProcess("Round Players"))
 {
     <h3>Players</h3>
     <div>
@@ -310,45 +319,45 @@
 <div>
     @foreach (var file in Model.CurrentRound.Files)
     {
-        if (file.FileName.Contains("photos"))
+        if (file.Name.Contains("photos"))
         {
         }
-        else if (file.Parsed)
+        else if (file.Processed || file.Decomposed)
         {
-            switch (file.FileName)
+            switch (file.Name)
             {
                 case "newscaster.json":
-                    <a asp-controller="Newscaster" asp-action="GetRound" asp-route-roundid="@Model.CurrentRound.ID" class="btn btn-outline-primary mb-1" data-placement="top">@file.FileName</a>
+                    <a asp-controller="Newscaster" asp-action="GetRound" asp-route-roundid="@Model.CurrentRound.Id" class="btn btn-outline-primary mb-1" data-placement="top">@file.Name</a>
                     break;
                 case "runtime.txt":
-                    <a asp-controller="Runtime" asp-action="GetRound" asp-route-round="@Model.CurrentRound.ID" class="btn btn-outline-primary mb-1">@file.FileName</a>
+                    <a asp-controller="Runtime" asp-action="GetRound" asp-route-round="@Model.CurrentRound.Id" class="btn btn-outline-primary mb-1">@file.Name</a>
                     break;
                 default:
-                    <a asp-controller="File" asp-action="FetchFile" asp-route-roundid="@Model.CurrentRound.ID" asp-route-file="@file.FileName" class="btn btn-outline-primary mb-1" data-placement="top">@file.FileName</a>
+                    <a asp-controller="File" asp-action="FetchFile" asp-route-roundid="@Model.CurrentRound.Id" asp-route-file="@file.Name" class="btn btn-outline-primary mb-1 @(file.Decomposed ? "" : "disabled")" data-placement="top">@file.Name</a>
                     break;
             }
         }
         else if (file.Failed)
         {
-            <a class="btn btn-outline-danger mb-1" data-placement="top">@file.FileName</a>
+            <a class="btn btn-outline-danger mb-1 disabled" data-placement="top">@file.Name</a>
         }
         else
         {
-            <a class="btn btn-outline-secondary mb-1" data-placement="top">@file.FileName</a>
+            <a class="btn btn-outline-secondary mb-1 disabled" data-placement="top">@file.Name</a>
         }
     }
 </div>
-@if (Model.CurrentRound.Files.Where(x => x.FileName.Contains("photos")).Any())
+@if (Model.CurrentRound.Files.Any(x => x.Name.Contains("photos")))
 {
     <br/>
     <h3>Pictures</h3>
     <div class="row ml-0 mr-0">
-        @foreach (var file in Model.CurrentRound.Files.Where(x => x.FileName.Contains("photos")))
+        @foreach (var file in Model.CurrentRound.Files.Where(x => x.Name.Contains("photos")))
         {
             <div class="card border-secondary mb-1 mr-1">
-                <img class="card-img-top round-photo" src="@Url.Action("FetchImage", "Image", new {id = file._id})" onerror="src = '/images/BrokenFile0Length.png'"/>
+                <img class="card-img-top round-photo" src="@Url.Action("FetchImage", "Image", new {id = file.Id})" onerror="src = '/images/BrokenFile0Length.png'"/>
                 <div class="card-body">
-                    <p class="card-text text-center">@file.FileName</p>
+                    <p class="card-text text-center">@file.Name</p>
                 </div>
             </div>
         }

@@ -21,8 +21,7 @@ namespace ScrubbyWeb
         }
 
         public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public static void ConfigureServices(IServiceCollection services)
         {
             services.AddDistributedMemoryCache();
@@ -41,7 +40,7 @@ namespace ScrubbyWeb
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddMvc().AddNewtonsoftJson();
+            services.AddMvc().AddRazorRuntimeCompilation().AddNewtonsoftJson();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -67,12 +66,16 @@ namespace ScrubbyWeb
             services.AddSingleton<MongoAccess>();
             services.AddTransient<IPlayerService, SqlPlayerService>();
             services.AddSingleton<ISuicideService, SqlSuicideService>();
-            services.AddSingleton<IRoundService, MongoRoundService>();
+            services.AddSingleton<IRoundService, SqlRoundService>();
             services.AddTransient<IConnectionService, SqlConnectionService>();
             services.AddSingleton<IRuntimeService, SqlRuntimeService>();
             services.AddSingleton<IAnnouncementService, SqlAnnouncementService>();
             services.AddTransient<ICKeyService, SqlCKeyService>();
             services.AddTransient<IUserService, MongoUserService>();
+            services.AddTransient<INewscasterService, MongoNewscasterService>();
+            services.AddTransient<IScrubbyService, SqlScrubbyService>();
+            services.AddTransient<IFileService, SqlFileService>();
+            services.AddTransient<IIconService, MongoIconService>();
             services.AddTransient<BYONDDataService>();
         }
 

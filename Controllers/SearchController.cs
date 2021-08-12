@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ScrubbyWeb.Models.PostRequests;
 using ScrubbyWeb.Services.Interfaces;
 
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace ScrubbyWeb.Controllers
 {
     public class SearchController : Controller

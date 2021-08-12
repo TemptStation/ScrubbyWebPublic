@@ -22,7 +22,7 @@ namespace ScrubbyWeb.Controllers
             var dbRound = await _roundService.GetRound(round);
             return View(new RoundRuntimeModel
             {
-                RoundID = dbRound.ID,
+                RoundID = dbRound.Id,
                 Version = dbRound.VersionInfo
             });
         }

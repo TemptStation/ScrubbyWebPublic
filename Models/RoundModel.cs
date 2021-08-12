@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ScrubbyCommon.Data;
+using ScrubbyWeb.Models.Data;
 
 namespace ScrubbyWeb.Models
 {
@@ -8,13 +10,16 @@ namespace ScrubbyWeb.Models
     {
         public int LastID { get; set; }
         public int NextID { get; set; }
-        public Round CurrentRound { get; set; }
+        public ScrubbyRound CurrentRound { get; set; }
         public List<string> HightlightedCkeys { get; set; }
         public List<CKey> NonPlaying { get; set; }
 
         public bool CompletedProcess(string name)
         {
-            return CurrentRound?.GetProcessStatus(name)?.Status == Status.Complete;
+            return CurrentRound?.Status?.Any(x =>
+                       x.Process.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                       x.Status == Status.Complete) ??
+                   false;
         }
 
         public Dictionary<string, List<Round.RoundPlayer>> PlayersByDepartment()

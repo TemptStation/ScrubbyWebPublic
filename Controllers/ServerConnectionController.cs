@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
-using ScrubbyCommon.Data;
-using ScrubbyWeb.Services.Mongo;
-
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Controllers
 {
@@ -16,11 +12,11 @@ namespace ScrubbyWeb.Controllers
     [Route("api/population")]
     public class ServerConnectionController : Controller
     {
-        private readonly IMongoCollection<ServerConnection> _connections;
+        private readonly IConnectionService _connections;
 
-        public ServerConnectionController(MongoAccess mongo)
+        public ServerConnectionController(IConnectionService connections)
         {
-            _connections = mongo.DB.GetCollection<ServerConnection>("connections");
+            _connections = connections;
         }
 
         [HttpPost("round")]
@@ -32,7 +28,7 @@ namespace ScrubbyWeb.Controllers
             var population = new Dictionary<DateTime, int>();
             var events = new Dictionary<DateTime, int>();
 
-            var connections = await _connections.Find(x => x.RoundID == (int) round).ToListAsync();
+            var connections = (await _connections.GetConnectionsForRound((int) round)).ToList();
 
             foreach (var connection in connections)
             {
@@ -51,7 +47,7 @@ namespace ScrubbyWeb.Controllers
             foreach (var timestep in events.OrderBy(x => x.Key))
             {
                 pop += timestep.Value;
-                population[timestep.Key] = pop;
+                population[timestep.Key.ToUniversalTime()] = pop;
             }
 
             var popOrdered = population.OrderBy(x => x.Key);

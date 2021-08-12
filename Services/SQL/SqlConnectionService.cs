@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
@@ -38,25 +39,29 @@ namespace ScrubbyWeb.Services.SQL
             return (await conn.QueryAsync<ServerRoundStatistic>(query, new {ckey = ckey.Cleaned, startDate})).ToList();
         }
 
-        public async Task<List<ServerConnection>> GetConnectionsForRound(int round, IEnumerable<string> ckeys)
+        public async Task<List<ServerConnection>> GetConnectionsForRound(int round, IEnumerable<string> ckeys = null)
         {
-            const string query = @"
+            var query = new StringBuilder(@"
                 SELECT
                     c.round AS RoundID,
-                    c.ckey,
+                    COALESCE(ck.byond_key, ck.ckey) AS ckey,
                     c.connect_time AS ConnectTime,
                     c.disconnect_time AS DisconnectTime,
                     c.byond_version AS ByondVersion,
                     s.display AS server
                 FROM
                     connection c
+                    LEFT JOIN ckey ck ON ck.ckey = c.ckey
                     INNER JOIN round r ON r.id = c.round
                     INNER JOIN server s ON s.id = r.server
                 WHERE
-                    c.round = @round
-                    AND c.ckey = ANY(@ckeys)";
+                    c.round = @round");
+
+            if (ckeys != null)
+                query.AppendLine(@" AND c.ckey = ANY(@ckeys)");
+            
             await using var conn = GetConnection();
-            return (await conn.QueryAsync<ServerConnection>(query, new {round, ckeys})).ToList();
+            return (await conn.QueryAsync<ServerConnection>(query.ToString(), new {round, ckeys})).ToList();
         }
     }
 }

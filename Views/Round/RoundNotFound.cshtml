@@ -1,13 +1,13 @@
 ﻿@model RoundModel
 @{
-    ViewData["Title"] = $"R{Model.CurrentRound.ID}";
+    ViewData["Title"] = $"R{Model.CurrentRound.Id}";
 }
 
 @section AddToHead {
-    <meta property="og:title" content="@($"R{Model.CurrentRound.ID}")"/>
+    <meta property="og:title" content="@($"R{Model.CurrentRound.Id}")"/>
     <meta property="og:type" content="website"/>
     <meta property="og:image" content="https://scrubby.melonmesa.com/images/ScrubbyBar.svg"/>
-    <meta property="og:url" content="https://scrubby.melonmesa.com/round/@Model.CurrentRound.ID"/>
+    <meta property="og:url" content="https://scrubby.melonmesa.com/round/@Model.CurrentRound.Id"/>
     <meta property="og:site_name" content="Scrubby"/>
     <meta property="og:description" content="Round incomplete, not yet parsed, or nonexistant..."/>
 }
@@ -17,7 +17,7 @@
         <li class="breadcrumb-item">
             <a asp-controller="Home" asp-action="Index">Gateway</a>
         </li>
-        <li class="breadcrumb-item active" aria-current="page">@($"R{Model.CurrentRound.ID}")</li>
+        <li class="breadcrumb-item active" aria-current="page">@($"R{Model.CurrentRound.Id}")</li>
     </ol>
 </nav>
 
@@ -43,7 +43,7 @@
         <div class="col-auto order-last order-md-2">
             <center>
                 <h1>
-                    @Model.CurrentRound.ID
+                    @Model.CurrentRound.Id
                 </h1>
                 <span class="badge badge-warning align-top">Round Missing</span>
             </center>

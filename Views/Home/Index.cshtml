@@ -25,10 +25,10 @@
             @foreach (var server in Model.LatestRounds)
             {
                 <div class="col-auto text-center">
-                    @(RoundController.ProperName(server.Item1)): <a asp-controller="Round" asp-action="FetchRound" asp-route-id="@server.Item3">@server.Item3</a>
-                    @if ((DateTime.Now - server.Item2).TotalHours > 3)
+                    @(server.Server): <a asp-controller="Round" asp-action="FetchRound" asp-route-id="@server.Id">@server.Id</a>
+                    @if ((DateTime.Now - server.Started).TotalHours > 3)
                     {
-                        <i class="fas fa-exclamation-triangle text-warning" data-toggle="tooltip" data-placement="top" title="@($"[LATE] Last log for {RoundController.ProperName(server.Item1)} posted {(DateTime.Now - server.Item2).TotalHours : 0.0} hours ago.")"></i>
+                        <i class="fas fa-exclamation-triangle text-warning" data-toggle="tooltip" data-placement="top" title="@($"[LATE] Last log for {server.Server} posted {(DateTime.Now - server.Started).TotalHours : 0.0} hours ago.")"></i>
                     }
                 </div>
             }

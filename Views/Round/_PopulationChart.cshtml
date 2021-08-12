@@ -1,4 +1,4 @@
-﻿@model ScrubbyCommon.Data.Round
+﻿@model ScrubbyWeb.Models.Data.ScrubbyRound
 @{
 
 }
@@ -7,7 +7,7 @@
     var chartData = null;
 
     $(document).ready(function() {
-        GetPopData({ round: @Model.ID, interval: 30 });
+        GetPopData({ round: @Model.Id, interval: 30 });
     });
 
     function GetPopData(data) {

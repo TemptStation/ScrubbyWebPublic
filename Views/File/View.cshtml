@@ -67,8 +67,8 @@
 </div>
 <script>
     var table = null;
-    var startTime = moment.utc("@(Model.Parent.Timestamp.ToString("s"))Z");
-    var idMap = { @(Html.Raw(string.Join(",\n", Model.Parent.Files.Select(x => $"\"{x._id}\": \"{x.FileName.Split(".")[0].ToUpper()}\"")))) };
+    var startTime = moment.utc("@(Model.Parent.StartTime.ToString("s"))Z");
+    var idMap = { @(Html.Raw(string.Join(",\n", Model.Parent.Files.Select(x => $"\"{x.Id}\": \"{x.Name.Split(".")[0].ToUpper()}\"")))) };
 
     $(document).ready(function() {
         $('#loading').addClass("hidden");
@@ -140,7 +140,7 @@
 
                 table.row.add([
                     message.timestamp,
-                    message.type,
+                    message.type || 'ABNORMAL',
                     message.message,
                     originToString(message.origin),
                     message.originName,

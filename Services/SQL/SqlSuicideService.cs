@@ -39,11 +39,11 @@ namespace ScrubbyWeb.Services.SQL
                 WHERE
                     s.ckey = @ckey");
             if (startDate.HasValue && endDate.HasValue)
-                query.AppendLine("AND m.timestamp BETWEEN @startDate AND @endDate");
+                query.AppendLine(" AND m.timestamp BETWEEN @startDate AND @endDate");
             else if (startDate.HasValue)
-                query.AppendLine("AND m.timestamp >= @startDate");
+                query.AppendLine(" AND m.timestamp >= @startDate");
             else if (endDate.HasValue)
-                query.AppendLine("AND m.timestamp <= @endDate");
+                query.AppendLine(" AND m.timestamp <= @endDate");
             await using var conn = GetConnection();
             return (await conn.QueryAsync<Suicide, SSVec, Suicide>(query.ToString(), (suicide, vec) =>
             {
