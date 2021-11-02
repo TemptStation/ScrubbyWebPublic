@@ -117,7 +117,7 @@
 
             var rounds = $.ajax({
                 type: "POST",
-                url: "../api/roundsforckeys",
+                url: "@(Url.Action("GetRoundsForCKeys"))",
                 contentType: "application/json; charset=utf-8",
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader("RequestVerificationToken",
@@ -154,7 +154,7 @@
 
         var connections = $.ajax({
             type: "POST",
-            url: "../api/connections/round",
+            url: "@Url.Action("GetConnectionsForRound")",
             contentType: "application/json; charset=utf-8",
             beforeSend: function(xhr) {
                 xhr.setRequestHeader("RequestVerificationToken",

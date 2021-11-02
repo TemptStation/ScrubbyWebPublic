@@ -1,15 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using ScrubbyWeb.Security;
 using ScrubbyWeb.Services;
 using ScrubbyWeb.Services.Interfaces;
 using ScrubbyWeb.Services.Mongo;
 using ScrubbyWeb.Services.SQL;
+using Tgstation.Auth;
 
 namespace ScrubbyWeb
 {
@@ -21,8 +27,8 @@ namespace ScrubbyWeb
         }
 
         public IConfiguration Configuration { get; }
-        
-        public static void ConfigureServices(IServiceCollection services)
+
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddDistributedMemoryCache();
 
@@ -33,16 +39,21 @@ namespace ScrubbyWeb
                 options.Cookie.IsEssential = true;
             });
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
             services.AddMvc().AddRazorRuntimeCompilation().AddNewtonsoftJson();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            // Forward along data from docker
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("::ffff:172.18.0.0"), 16));
+            });
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = TgDefaults.AuthenticationScheme;
+                })
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/login";
@@ -50,18 +61,15 @@ namespace ScrubbyWeb
                     options.ExpireTimeSpan = TimeSpan.FromDays(7);
                     options.SlidingExpiration = true;
                     options.Cookie.IsEssential = true;
+                })
+                .AddTgstation(options =>
+                {
+                    var tgAuthSection = Configuration.GetSection("Authentication:Tgstation");
+                    options.ClientId = tgAuthSection["ClientId"];
+                    options.ClientSecret = tgAuthSection["ClientSecret"];
+                    options.CallbackPath = "/auth";
+                    options.Scope.Add("user.groups");
                 });
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.LoginPath = "/login";
-                options.Cookie.Name = "Scrubby";
-                options.ExpireTimeSpan = TimeSpan.FromDays(7);
-                options.SlidingExpiration = true;
-                options.Cookie.IsEssential = true;
-            });
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<MongoAccess>();
             services.AddTransient<IPlayerService, SqlPlayerService>();
@@ -77,11 +85,13 @@ namespace ScrubbyWeb
             services.AddTransient<IFileService, SqlFileService>();
             services.AddTransient<IIconService, MongoIconService>();
             services.AddTransient<BYONDDataService>();
+            services.AddSingleton<IClaimsTransformation, ScrubbyUserClaimsTransformation>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
+            app.UseForwardedHeaders();
+
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             else
@@ -91,7 +101,6 @@ namespace ScrubbyWeb
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSession();
-            app.UseCookiePolicy();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

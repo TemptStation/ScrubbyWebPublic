@@ -263,7 +263,7 @@
         };
 
         $.ajax({
-            url: "@(Model.Key.Cleaned)/connections?length=@daysOfData",
+            url: "@(Url.Action("GetConnectionData", "CKey", new { ckey = Model.Key.Cleaned, length = daysOfData }))",
             type: "POST",
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
@@ -448,7 +448,7 @@
         };
 
         $.ajax({
-            url: "@(Model.Key.Cleaned)/receipts",
+            url: "@(Url.Action("GetReceipts", "CKey", new { ckey = Model.Key.Cleaned }))",
             type: "POST",
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",

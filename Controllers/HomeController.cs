@@ -12,8 +12,7 @@ namespace ScrubbyWeb.Controllers
         {
             _scrubby = scrubby;
         }
-        
-        [ResponseCache(Duration = 300)]
+
         public async Task<IActionResult> Index()
         {
             return View(await _scrubby.GetBasicStats());

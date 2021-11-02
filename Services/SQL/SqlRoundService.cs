@@ -25,6 +25,12 @@ namespace ScrubbyWeb.Services.SQL
             var playersQuery = GetRoundPlayers(id);
             await Task.WhenAll(roundQuery, fileQuery, processQuery, playersQuery);
             var toReturn = roundQuery.Result;
+            
+            // If we found no round, do not bother trying to associate related data...
+            if (toReturn == null)
+                return null;
+
+            // Associate related data
             toReturn.Files = fileQuery.Result.ToList();
             toReturn.Status = processQuery.Result.ToList();
             toReturn.Players = playersQuery.Result.ToList();
@@ -74,6 +80,10 @@ namespace ScrubbyWeb.Services.SQL
                 
                 return round;
             }, new { roundId }, splitOn: "master,pr");
+
+            // Found no record of this round
+            if (toReturn == null)
+                return null;
             
             // Set UTC
             toReturn.StartTime = toReturn.StartTime.ToUniversalTime();

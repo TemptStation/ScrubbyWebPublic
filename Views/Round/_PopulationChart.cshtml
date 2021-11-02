@@ -12,7 +12,7 @@
 
     function GetPopData(data) {
         $.ajax({
-            url: "../api/population/round",
+            url: "@Url.Action("GetPopulationForRound", "ServerConnection")",
             type: "POST",
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",

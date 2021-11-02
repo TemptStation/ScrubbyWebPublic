@@ -120,7 +120,7 @@
 
         var messages = $.ajax({
             type: "POST",
-            url: "../../api/file/messages",
+            url: "@(Url.Action("FetchMessages", "File"))",
             contentType: "application/json; charset=utf-8",
             beforeSend: function(xhr) {
                 xhr.setRequestHeader("RequestVerificationToken",

@@ -9,7 +9,7 @@ using ScrubbyWeb.Services.Interfaces;
 
 namespace ScrubbyWeb.Controllers
 {
-    [Authorize(Roles = "Developer,TGAdmin,BetaTester")]
+    [Authorize(Roles = "Developer,In-Game Admin,BetaTester")]
     public class InvestigateController : Controller
     {
         private readonly IConnectionService _connectionService;

@@ -18,11 +18,9 @@ namespace ScrubbyWeb.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> Me()
         {
-            var uname = User.Identity.Name;
-            var foundUser = await _users.GetUser(uname);
-            if (foundUser == null)
+            if (await _users.GetUser(User.Identity?.Name) == null)
                 return Unauthorized("You are not logged in");
-            return View("User", foundUser);
+            return View("User");
         }
     }
 }

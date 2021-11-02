@@ -63,7 +63,7 @@
 
         var dataResponse = $.ajax({
             type: "POST",
-            url: "../api/search/player",
+            url: "@Url.Action("ExecutePlayerSearch")",
             contentType: "application/json; charset=utf-8",
             beforeSend: function(xhr) {
                 xhr.setRequestHeader("RequestVerificationToken",
