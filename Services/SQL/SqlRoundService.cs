@@ -109,7 +109,7 @@ namespace ScrubbyWeb.Services.SQL
                     (EXISTS (SELECT 1 FROM log_message m WHERE m.parent_file = rf.id LIMIT 1)) AS decomposed
                 FROM
                     round r
-                    LEFT JOIN round_file rf ON rf.round = r.id
+                    INNER JOIN round_file rf ON rf.round = r.id
                 WHERE
                     r.id = @round";
             await using var conn = GetConnection();
@@ -126,7 +126,7 @@ namespace ScrubbyWeb.Services.SQL
                     rp.status
                 FROM
                     round r
-                    LEFT JOIN round_process rp ON rp.round = r.id
+                    INNER JOIN round_process rp ON rp.round = r.id
                 WHERE
                     r.id = @round";
             await using var conn = GetConnection();
@@ -146,7 +146,7 @@ namespace ScrubbyWeb.Services.SQL
                     rp.ckey AS CleanKey
                 FROM
                     round r
-                    LEFT JOIN round_player rp ON rp.round = r.id
+                    INNER JOIN round_player rp ON rp.round = r.id
                     LEFT JOIN ckey c ON c.ckey = rp.ckey
                 WHERE
                     r.id = @round";
