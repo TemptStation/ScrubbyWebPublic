@@ -23,7 +23,7 @@ namespace ScrubbyWeb.Services.SQL
                 SELECT
                     s.display AS server,
                     r.starttime::date AS date,
-                    COUNT(r.id),
+                    COUNT(DISTINCT r.id),
                     ROUND((EXTRACT(EPOCH FROM SUM(c.disconnect_time - c.connect_time)) / (3600.0))::numeric, 2) AS hours
                 FROM
                     round r
